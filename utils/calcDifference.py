@@ -8,6 +8,9 @@ def differenceBetweenDataframes(df1, df2):
         difference_df = pd.DataFrame()
         difference_df['Datum'] = df1['Datum']
         difference_df['Differenz'] =  df1['Gesamtverbrauch']- df2['Gesamterzeugung_EE']
+
+        difference_df['Year Month'] = difference_df['Datum'].dt.strftime('%Y %m')
+        difference_df['Day'] = difference_df['Datum'].dt.strftime('%d')
         
         #print(difference_df)
         return difference_df
