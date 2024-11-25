@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directory_yearly_consumption):
     # Erstelle einen leeren DataFrame, um die Ergebnisse zu speichern
@@ -34,7 +35,16 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
         else:
             print(f"DataFrames für das Jahr {year} fehlen in einem der Verzeichnisse.")
 
+    
+    year_2024 = all_years_difference_df[all_years_difference_df['Jahr'] == 2024]
+    print(year_2024)
     yearly_sums = all_years_difference_df.groupby('Jahr')['Differenz'].sum()
+
+    # Funktion zum Runden und Formatieren der Y-Achse
+    def millions(x, pos):
+        return f'{x * 1e-6:.0f} Mio'
+
+    
 
     # Erstelle das Liniendiagramm
     plt.figure(figsize=(10, 6))
@@ -42,9 +52,13 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
 
     # Achsenbeschriftungen und Titel hinzufügen
     plt.xlabel('Jahr')
-    plt.ylabel('Summe der Differenz')
+    plt.ylabel('Summe der Differenz (MWh)')
     plt.title('Jährliche Summe der Differenz zwischen Verbrauch und Produktion')
     plt.grid(True)
+
+    # Formatter anwenden
+    formatter = FuncFormatter(millions)
+    plt.gca().yaxis.set_major_formatter(formatter)
 
     # Diagramm anzeigen
     plt.show()
