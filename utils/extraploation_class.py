@@ -53,7 +53,7 @@ class Extrapolation:
 
         self.multiply()
         self.update_year()
-        # addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
+        #addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
     def multiply(self):
         if self.factor_OnShore is not None:
