@@ -93,7 +93,9 @@ def read_SMARD_data(path, mode):
         print("Mode not found")
 
     #addTimeInformation(df)
-
+    #Formatierung der Datumstpalte
+        df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
+        
     return df
 
 
