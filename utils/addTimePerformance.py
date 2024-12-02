@@ -17,7 +17,6 @@ def addTimePerformance(df,year):
 
         #Zeitspalte korrekt formatieren
         df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
-        print(df)
 
     return df
 
