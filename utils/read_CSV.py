@@ -27,9 +27,9 @@ def read_SMARD_data(path, mode):
             "Sonstige Konventionelle [MWh] Originalauflösungen":"Sonstige Konventionelle"    
         }, inplace = True)
 
-        df.drop(columns = ["Biomasse"], inplace = True)
-        df.drop(columns = ["Wasserkraft"], inplace = True)
-        df.drop(columns = ["Sonstige Erneuerbare"], inplace = True)
+        #df.drop(columns = ["Biomasse"], inplace = True)
+        #df.drop(columns = ["Wasserkraft"], inplace = True)
+        #df.drop(columns = ["Sonstige Erneuerbare"], inplace = True)
         df.drop(columns = ["Kernenergie"], inplace = True)
         df.drop(columns = ["Braunkohle"], inplace = True)
         df.drop(columns = ["Steinkohle"], inplace = True)
@@ -39,6 +39,11 @@ def read_SMARD_data(path, mode):
 
         #Formatierung der Datumstpalte
         df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
+
+        #Werte des 29.Februar entfernen, falls vorhanden
+        df = df[~((df['Datum'].dt.month == 2) & (df['Datum'].dt.day == 29))].sort_values(by="Datum")
+        df.reset_index(drop=True, inplace=True)
+
 
     elif mode == "Comsumption":
         #Umbenennung der Spalten
