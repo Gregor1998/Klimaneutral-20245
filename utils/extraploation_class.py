@@ -1,4 +1,5 @@
 from utils.addTimeInformation import addTimeInformation
+import pdb
 
 """
 class Extrapolation: #Erstellt ein Objekt, welches ein DataFrame mitbekommt, und bestimmte werte aus diesen DataFrame Multipliziert
@@ -69,3 +70,37 @@ class Extrapolation:
         # Ändern der Jahreskomponente in der "Datum"-Spalte
         self.df["Datum"] = self.df["Datum"].apply(lambda x: x.replace(year=self.year))
         self.df["Year"] = self.year
+
+
+class Extrapolation_Consumption(Extrapolation):
+    
+    def __init__(self, df, year,  factor_OnShore=None, factor_OffShore=None, factor_Photo=None, factor_Consumption=None, lastprofil_dict=None):
+        super().__init__(df, year, None, None, None, factor_Consumption=factor_Consumption)
+
+        self.lastprofil = lastprofil_dict
+        #self.apply_lastprofile()
+        addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
+
+    def apply_lastprofile(self):
+        for idx, row in self.df.iterrows():
+
+            
+            
+            weekday = row['Weekday']
+            weekend = ['6', '7']
+            workday = ['1', '2', '3', '4', '5']
+
+            if(weekday in weekend):
+                lastprofil = self.lastprofil['weekend']
+            elif(weekday in workday):
+                lastprofil = self.lastprofil['workday']
+
+
+            
+            print(idx, self.df.loc[idx, 'Gesamtverbrauch'], lastprofil.loc[idx, 'lastprofil'])
+            
+            # Stellen Sie sicher, dass die Indizes übereinstimmen
+            #lastprofil.index = [idx]
+            #print(self.df.loc[idx, 'Gesamtverbrauch'], lastprofil.loc[idx, 'lastprofil'])
+            self.df.loc[idx, 'Gesamtverbrauch'] += lastprofil.loc[idx, 'lastprofil']
+            

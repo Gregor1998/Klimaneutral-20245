@@ -38,10 +38,10 @@ def create_week_comparison(year, week, consumption_data, production_data):
     plt.figure(figsize=(10, 6))
 
     # Plot consumption
-    plt.plot(consumption_data['Datum'], consumption_data['Gesamtverbrauch'], label='Verbrauch', marker='o')
+    plt.plot(consumption_data['Datum'], consumption_data.iloc[:, 1], label='Verbrauch', marker='o')
 
     # Plot production
-    plt.plot(production_data['Datum'], production_data['EE_Gesamt'], label='EE-Erzeugung', marker='o')
+    plt.plot(production_data['Datum'], production_data.iloc[:, 1], label='EE-Erzeugung', marker='o')
 
     
      # Customize x-axis to show one tick per day
