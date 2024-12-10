@@ -54,7 +54,7 @@ class Extrapolation:
 
         self.multiply()
         self.update_year()
-        # addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
+        addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
     def multiply(self):
         if self.factor_OnShore is not None:
@@ -101,6 +101,6 @@ class Extrapolation_Consumption(Extrapolation):
             
             # Stellen Sie sicher, dass die Indizes übereinstimmen
             #lastprofil.index = [idx]
-            #print(self.df.loc[idx, 'Gesamtverbrauch'], lastprofil.loc[idx, 'lastprofil'])
+            print(self.df.loc[idx, 'Gesamtverbrauch'], lastprofil.loc[idx, 'lastprofil'])
             self.df.loc[idx, 'Gesamtverbrauch'] += lastprofil.loc[idx, 'lastprofil']
             
