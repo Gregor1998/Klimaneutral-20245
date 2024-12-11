@@ -6,9 +6,13 @@ def addTimePerformance(df,year):
     end_date    = f'{year}-12-31 23:45:00'
 
     #Zeitreiehe in 15 min Takt erstellen
-    time_range = pd.date_range(start=start_date, end=end_date, freq='15T')
+    time_range = pd.date_range(start=start_date, end=end_date, freq='15min')
+    #Herauslöschen der Spalten des 29.Februars,falls vorhanden
+    time_range = time_range[~((time_range.month == 2) & (time_range.day == 29))]
+    df.reset_index(drop=True, inplace=True)
 
-    #Überprüfen, ob die Lännge der Zeitreihe mit der Länge des übergebenen DataFrames übereinstimmt
+    #Überprüfen, ob die Lännge der Zeitreihe mit der Länge des übergebenen DataFrames übereinstimmmt
+
     if len(df) != len(time_range):
         raise ValueError('Length of DataFrame and Time Range do not match')
     else:

@@ -6,8 +6,10 @@ from utils.addTimeInformation import addTimeInformation
 def read_SMARD_data(path, mode):
     df = pd.read_csv(path,delimiter= ';', thousands='.', decimal=',', dayfirst ="True") #, parse_dates=[[0,1]]
 
+    retrunvalue = None
     #Herauslöschen der Spalte Datum bis, da diese keine zusätzlichen Informationen bietet
-    df.drop(columns=["Datum bis"], inplace=True)
+    if mode != "Heatpump":
+        df.drop(columns=["Datum bis"], inplace=True)
 
     if mode == "Generation":
         #Umbenennung der Spalten
@@ -94,6 +96,18 @@ def read_SMARD_data(path, mode):
         df.drop(columns = ["Pumpspeicher"], inplace = True)
         df.drop(columns = ["Sonstige Konventionelle"], inplace = True)
 
+    elif(mode == "Heatpump"):
+         #Formatierung der Datumstpalte
+            df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
+
+            #Herauslöschen der Zeilen des 29. Feburars
+            #Werte des 29.Februar entfernen, falls vorhanden
+            df = df[~((df['Datum'].dt.month == 2) & (df['Datum'].dt.day == 29))].sort_values(by="Datum")
+            df.reset_index(drop=True, inplace=True)
+
+            df.drop(columns = ["Datum"], inplace = True)
+
+
     else :
         print("Mode not found")
 
@@ -146,8 +160,20 @@ def getData(mode):
                 print(f"Data für {year} loaded succsessfully.")
             else:
                 print(f"File for {year} not found at path: {file_path}")
+    
+    elif mode == "Heatpump":
+        path_var = "load-profile/"
+        file_path = os.path.join(path_var, "Wärmepumpe.csv")
+        if os.path.exists(file_path):
+            df_heatpump = read_SMARD_data(file_path, "Heatpump")
+
     else:
         print("Mode not found")
 
-
-    return dataFrames   #Rückgabe der eingelesenen Date als DataFrame
+    
+    if mode == "Heatpump":
+        returnvalue = df_heatpump
+    else:
+        returnvalue = dataFrames
+    
+    return returnvalue  #Rückgabewert je nach Modus
