@@ -30,6 +30,55 @@ def StorageIntegration(difference_df, storage_capacity):
     pd.DataFrame: DataFrame with 'Datum', 'Differenz', 'Speicher', and 'Netz' columns, where 'Speicher' represents the storage values and 'Netz' represents the net energy flow.
     """
     storage = 0
+    capacity = storage_capacity * 10**6
+    storage_df = pd.DataFrame()
+    storage_df['Datum'] = difference_df['Datum']
+    storage_df['Differenz'] = difference_df['Differenz']
+    storage_df['Kapazität'] = 0.0
+    storage_df['Laden/Einspeisen'] = 0.0
+
+    for i in range(len(difference_df)):
+        diff = difference_df.loc[i, 'Differenz']
+        
+        if diff < 0:  # Überschussenergie
+            if storage < capacity:
+                if storage + abs(diff) > capacity:
+                    storage = capacity
+                    storage_df.loc[i, 'Kapazität'] = storage
+                    storage_df.loc[i, 'Laden/Einspeisen'] = (-1)*diff
+                else:
+                    storage += abs(diff)
+                    storage_df.loc[i, 'Kapazität'] = storage
+                    storage_df.loc[i, 'Laden/Einspeisen'] = (-1)*diff
+            else:
+                storage_df.loc[i, 'Kapazität'] = storage
+                storage_df.loc[i, 'Laden/Einspeisen'] = 0
+        else:  # Energiedefizit
+            if storage > 0:
+                if storage - diff < 0:
+                    storage = 0
+                    storage_df.loc[i, 'Kapazität'] = storage
+                    storage_df.loc[i, 'Laden/Einspeisen'] = (-1)*storage
+                else :
+                    storage -= diff
+                    storage_df.loc[i, 'Kapazität'] = storage
+                    storage_df.loc[i, 'Laden/Einspeisen'] = (-1)*diff
+            else:
+                storage_df.loc[i, 'Kapazität'] = 0
+                storage_df.loc[i, 'Laden/Einspeisen'] = 0
+    return storage_df
+
+"""def StorageIntegration(difference_df, storage_capacity):
+    
+    Integrates storage based on the difference dataframe, storage capacity, and threshold.
+    Parameters:
+    difference_df (pd.DataFrame): DataFrame containing 'Datum' and 'Differenz' columns.
+    storage_capacity (int): Maximum storage capacity.
+    threshold (int): Threshold value for difference.
+    Returns:
+    pd.DataFrame: DataFrame with 'Datum', 'Differenz', 'Speicher', and 'Netz' columns, where 'Speicher' represents the storage values and 'Netz' represents the net energy flow.
+    
+    storage = 0
     storage_df = pd.DataFrame()
     storage_df['Datum'] = difference_df['Datum']
     storage_df['Differenz'] = difference_df['Differenz']
@@ -56,4 +105,4 @@ def StorageIntegration(difference_df, storage_capacity):
                 storage = 0
                 storage_df.loc[i, 'Speicher'] = storage
 
-    return storage_df
+    return storage_df"""
