@@ -38,10 +38,10 @@ def create_week_comparison(year, week, consumption_data, production_data):
     plt.figure(figsize=(10, 6))
 
     # Plot consumption
-    plt.plot(consumption_data['Datum'], consumption_data.iloc[:, 1], label='Verbrauch', marker='o')
+    plt.plot(consumption_data['Datum'], consumption_data.iloc[:, 1], label=production_data.columns[1], marker=',')
 
     # Plot production
-    plt.plot(production_data['Datum'], production_data.iloc[:, 1], label='EE-Erzeugung', marker='o')
+    plt.plot(production_data['Datum'], production_data.iloc[:, 1], label=production_data.columns[1], marker=',')
 
     
      # Customize x-axis to show one tick per day
@@ -50,11 +50,20 @@ def create_week_comparison(year, week, consumption_data, production_data):
     formatted_labels = [date.strftime('%d.%m.%Y') for date in unique_dates]  # Format labels
     plt.gca().set_xticklabels(formatted_labels, rotation=45, ha='right')  # Set labels and rotate
 
+    plt.gcf().autofmt_xdate()
+
+    # Setzen der Ticks auf stündliche Intervalle
+    hourly_ticks = pd.date_range(start=consumption_data['Datum'].min(), end=consumption_data['Datum'].max(), freq='h')
+    plt.gca().set_xticks(hourly_ticks)
+
+    plt.xlim(consumption_data['Datum'].min(), consumption_data['Datum'].max())
+
+
 
     # Adding labels and title
     plt.xlabel('Datum', fontsize=12)
     plt.ylabel('Mwh', fontsize=12)
-    plt.title(f'Wochenverbrauch und -erzeugung KW {week}, {year}', fontsize=14)
+    plt.title(f'Vergleich für KW {week}, {year}', fontsize=14)
     plt.legend(fontsize=12)
     plt.grid(True)
 
