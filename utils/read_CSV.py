@@ -162,7 +162,7 @@ def getData(mode):
                 print(f"File for {year} not found at path: {file_path}")
     
     elif mode == "Heatpump":
-        path_var = "load-profile/"
+        path_var = "CSV/Lastprofile/waermepumpe/"
         file_path = os.path.join(path_var, "Wärmepumpe.csv")
         if os.path.exists(file_path):
             df_heatpump = read_SMARD_data(file_path, "Heatpump")
