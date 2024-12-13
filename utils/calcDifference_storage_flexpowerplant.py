@@ -50,7 +50,7 @@ def StorageIntegration(difference_df, storage_capacity, flexipowerplant_power):
     flexipowerplant_df = pd.DataFrame()
     flexipowerplant_df['Datum'] = difference_df['Datum']
     flexipowerplant_df['Kapazität in kWh'] = flexipowerplant_capacity
-    flexipowerplant_df['Restkapazität in kWh '] = flexipowerplant_capacity
+    flexipowerplant_df['Restkapazität in kWh'] = flexipowerplant_capacity
     flexipowerplant_df['Einspeisung in kWh'] = 0.0
 
     for i in range(len(difference_df)):
