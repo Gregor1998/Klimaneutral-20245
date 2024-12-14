@@ -54,7 +54,11 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
+
+# Ensure the directory exists
+output_dir ='.\CSV/Installed/'
+
 # Save projections to CSV
 for scenario, projections in scenario_projections.items():
     for category, df in projections.items():
-        df.to_csv(f'{scenario}_{category}_projections.csv', index=False)
+        df.to_csv(f'{output_dir}{scenario}_{category}_projections.csv', index=False)
