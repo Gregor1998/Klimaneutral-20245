@@ -74,10 +74,12 @@ class Extrapolation:
 
 class Extrapolation_Consumption(Extrapolation):
     
-    def __init__(self, df, year,  factor_OnShore=None, factor_OffShore=None, factor_Photo=None, factor_Consumption=None, lastprofil_dict=None):
+    def __init__(self, df, year,  factor_OnShore=None, factor_OffShore=None, factor_Photo=None, factor_Consumption=None, lastprofil_dict=None, lastprofil_waermepumpe_year = None):
         super().__init__(df, year, None, None, None, factor_Consumption=factor_Consumption)
 
         self.lastprofil = lastprofil_dict
+        self.waermepumpe = lastprofil_waermepumpe_year
+        
         self.apply_lastprofile()
         addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
