@@ -31,10 +31,10 @@ def StorageIntegration(difference_df, storage_capacity, flexipowerplant_power):
     """
     storage = 0
     flexipowerplant = 0
-    battery_capacity = storage_capacity * 10**6 # in kWh
+    battery_capacity = storage_capacity * 10**3# in Mwh
     #pumpstorage_capacity = pumpstorage_capacity * 10**6
-    flexipowerplant_power = flexipowerplant_power * 10**6 # in kW
-    flexipowerplant_capacity = flexipowerplant_power * (15/60) # in kWh
+    flexipowerplant_power = flexipowerplant_power * 10**3# in MW
+    flexipowerplant_capacity = flexipowerplant_power * (15/60) # in Mwh
 
 
     storage_df = pd.DataFrame()
