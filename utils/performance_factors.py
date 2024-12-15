@@ -42,7 +42,6 @@ def performance_factors(directoryGeneration,directoryInstalled):
                 performance_factors["Wind Offshore"] = directoryGeneration[year]["Wind Offshore"] / OffShore_factor
 
             
-
         #Hinzufügen des DataFrames für das entsprechende Jahr zum Directory
         directory_performance_factors[year] = performance_factors
 
