@@ -107,9 +107,9 @@ def calculateGeneration(case_PV, case_WindOnshore, case_WindOffshore,df_performa
       
       directoryGeneration[year] = combined_generation
       
-    #Abspeichern der Generation pro Jahr im Directory
+      #Abspeichern der Generation pro Jahr im Directory
 
-   return directoryGeneration
+      return directoryGeneration
 
     
 
