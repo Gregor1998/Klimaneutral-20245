@@ -87,12 +87,15 @@ class Extrapolation_Consumption(Extrapolation):
         saturday = ["6"]  # Samstag
         sunday = ["7"]  # Sonntag
         workday = ["1", "2", "3", "4", "5"]  # Montag bis Freitag
+
+        print(len(self.waermepumpe), len(self.df))
+
+
         
     
         for idx, row in self.df.iterrows():
             weekday = row['Weekday']
             lp = None
-
            
             if weekday in saturday:
                 lp = self.lastprofil['saturday']
@@ -108,7 +111,7 @@ class Extrapolation_Consumption(Extrapolation):
             lastprofil_idx = idx % len(lp)
 
             # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
-            self.df.loc[idx, 'Gesamtverbrauch'] += (lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000)
+            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + self.waermepumpe.loc[idx, 'Verbrauch'])
 
 
         #self.df.drop(columns=['Weekday'], inplace=True)
