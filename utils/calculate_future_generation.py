@@ -28,9 +28,9 @@ def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, da
     # Zusammenführen der Daten
     df_combined = pd.concat([
         df_filtered_PV['year'],
-        df_filtered_PV['predicted_capacity'],
-        df_filtered_Onshore['predicted_capacity'],
-        df_filtered_Offshore['predicted_capacity']
+        df_filtered_PV['projected_capacity'],
+        df_filtered_Onshore['projected_capacity'],
+        df_filtered_Offshore['projected_capacity']
     ], axis=1)
     df_combined.columns = ['Jahr', 'Photovoltaik', 'Wind Onshore', 'Wind Offshore']
 
