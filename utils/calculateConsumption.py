@@ -50,10 +50,6 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
         # Berechnen Sie den Index im Lastprofil-DataFrame
         lastprofil_idx = idx % len(lp)
 
-        if idx == 0:
-            print(lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000)
-            print(base_heatpump_lp.loc[idx, 'Verbrauch'])
-
         # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
         row['Gesamtverbrauch'] -= ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + base_heatpump_lp.loc[idx, 'Verbrauch'])
 
