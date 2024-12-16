@@ -49,6 +49,8 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
     plt.ylabel('Summe der Differenz')
     plt.title('Jährliche Summe der Differenz zwischen Verbrauch und Produktion')
     plt.grid(True)
-
+    plt.savefig('assets/plots/residual_diagramm.png')
     # Diagramm anzeigen
     plt.show()
+
+    

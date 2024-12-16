@@ -6,7 +6,7 @@ from utils.addTimeInformation import addTimeInformation
 from utils.calcDifference_storage_flexpowerplant import differenceBetweenDataframes, StorageIntegration
 from utils.cleanse_dataframes import cleanse_dataframes
 
-def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, directory_yearly_generation):
+def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, directory_yearly_generation, fileName=None,):
     yearly_consumption = pd.DataFrame.from_dict(consumption_extrapolation.get(int(selectedYear)))
     #print("consumption", consumption_extrapolation)
 
@@ -91,12 +91,13 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
     data_all_combined = week_filtered_data_all_combined[['Datum', 'EE + Speicher + Flexible in MWh']]
     data_all_combined['Datum'] = pd.to_datetime(data_all_combined['Datum'])
     
-   
+
 
     create_week_comparison(selectedYear, selectedWeek, week_consumption_df, week_production_df, data_storage_df, data_storage_ee_combined, data_flex_df, data_all_combined)
 
 
 def create_week_comparison(year, week, consumption_data, production_data, storage_data=None, flex_data=None, storage_ee_data=None, all_combined_data=None):
+
     # TODO:spaltenname der verglichen werden soll mitübergeben
     
     # Assuming your dataframes have columns 'Date' and 'Energy'
@@ -151,4 +152,7 @@ def create_week_comparison(year, week, consumption_data, production_data, storag
 
     # Display the plot
     plt.tight_layout()
+    plt.savefig('assets/plots/' + fileName + '.png')
     plt.show()
+
+    
