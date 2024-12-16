@@ -1,4 +1,5 @@
 from utils.addTimeInformation import addTimeInformation
+from typing import override
 import pdb
 
 """
@@ -83,16 +84,12 @@ class Extrapolation_Consumption(Extrapolation):
         self.apply_lastprofile()
         addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
+
     def apply_lastprofile(self):
         saturday = ["6"]  # Samstag
         sunday = ["7"]  # Sonntag
         workday = ["1", "2", "3", "4", "5"]  # Montag bis Freitag
 
-        print(len(self.waermepumpe), len(self.df))
-
-
-        
-    
         for idx, row in self.df.iterrows():
             weekday = row['Weekday']
             lp = None
