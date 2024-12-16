@@ -22,7 +22,7 @@ installed_df['Jahr'] = pd.to_datetime(installed_df['Jahr'], format='%Y')
 installed_df[['Photovoltaik', 'Wind Onshore', 'Wind Offshore']] = installed_df[['Photovoltaik', 'Wind Onshore', 'Wind Offshore']].apply(pd.to_numeric, errors='coerce')
 
 # Define a function for trend projection
-def project_trends(data, category, start_year, end_year, degree=1):
+def project_trends(data, category, start_year, end_year, degree=2):
     projections = {}
     category_data = data[['Jahr', category]].dropna()
     category_data = category_data[category_data['Jahr'].dt.year >= start_year]
@@ -65,9 +65,9 @@ projections_on = project_trends(installed_df, 'Wind Onshore', regression_on_star
 projections_off = project_trends(installed_df, 'Wind Offshore', regression_off_start, end_year, degree=2)
 
 growth_rates = {
-    'Photovoltaik': {'worst': 8.8, 'average': 12.9, 'best': 16.9},
-    'Wind Onshore': {'worst': 3.3, 'average': 6.6, 'best': 10.4},
-    'Wind Offshore': {'worst': 3.0, 'average': 13.1, 'best': 23.2}
+    'Photovoltaik': {'worst': 8.8, 'average': 12.9, 'best': 14.61},
+    'Wind Onshore': {'worst': 3.3, 'average': 6.6, 'best': 9.48},
+    'Wind Offshore': {'worst': 3.0, 'average': 13.1, 'best': 19.8}
 }
 
 if not os.path.exists('./CSV/Installed/'):
@@ -105,8 +105,8 @@ plt.figure(figsize=(12, 8))
 # Plot Photovoltaik projections
 plt.subplot(3, 1, 1)
 plt.plot(projections_pv['Photovoltaik']['year'], projections_pv['Photovoltaik']['predicted_capacity'], label='Regression')
-for scenario in scenarios:
-    plt.plot(all_projections['Photovoltaik'][scenario]['year'], all_projections['Photovoltaik'][scenario]['projected_capacity'], label=f'Photovoltaik {scenario}')
+for scenario, color in zip(scenarios, ['red', 'orange', 'green']):
+    plt.plot(all_projections['Photovoltaik'][scenario]['year'], all_projections['Photovoltaik'][scenario]['projected_capacity'], label=f'Photovoltaik {scenario}', color=color)
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('Photovoltaik Projections')
@@ -116,8 +116,8 @@ plt.grid(True)
 # Plot Wind Onshore projections
 plt.subplot(3, 1, 2)
 plt.plot(projections_on['Wind Onshore']['year'], projections_on['Wind Onshore']['predicted_capacity'], label='Regression')
-for scenario in scenarios:
-    plt.plot(all_projections['Wind Onshore'][scenario]['year'], all_projections['Wind Onshore'][scenario]['projected_capacity'], label=f'Wind Onshore {scenario}')
+for scenario, color in zip(scenarios, ['red', 'orange', 'green']):
+    plt.plot(all_projections['Wind Onshore'][scenario]['year'], all_projections['Wind Onshore'][scenario]['projected_capacity'], label=f'Wind Onshore {scenario}', color=color)
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('Wind Onshore Projections')
@@ -127,8 +127,8 @@ plt.grid(True)
 # Plot Wind Offshore projections
 plt.subplot(3, 1, 3)
 plt.plot(projections_off['Wind Offshore']['year'], projections_off['Wind Offshore']['predicted_capacity'], label='Regression')
-for scenario in scenarios:
-    plt.plot(all_projections['Wind Offshore'][scenario]['year'], all_projections['Wind Offshore'][scenario]['projected_capacity'], label=f'Wind Offshore {scenario}')
+for scenario, color in zip(scenarios, ['red', 'orange', 'green']):
+    plt.plot(all_projections['Wind Offshore'][scenario]['year'], all_projections['Wind Offshore'][scenario]['projected_capacity'], label=f'Wind Offshore {scenario}', color=color)
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('Wind Offshore Projections')

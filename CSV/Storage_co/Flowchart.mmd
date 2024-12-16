@@ -1,0 +1,29 @@
+flowchart TD
+    A["Start"] --> B{"Differenz < 0?"}
+    
+    B -->|Ja| C{"Speicher < Batteriekapazität?"}
+    B -->|Nein| D{"Speicher > 0?"}
+    
+    C -->|Ja| E{"Speicher + |Differenz| > Batteriekapazität?"}
+    C -->|Nein| F["Speicherstand unverändert\nLaden/Einspeisen = 0"]
+    
+    E -->|Ja| G["Speicher = Batteriekapazität\nLaden/Einspeisen = -Differenz"]
+    E -->|Nein| H["Speicher += |Differenz|\nLaden/Einspeisen = -Differenz"]
+    
+    D -->|Ja| I{"Speicher - Differenz < 0?"}
+    D -->|Nein| J["Speicher = 0\nLaden/Einspeisen = 0\nPrüfe Flexkraftwerk"]
+    
+    I -->|Ja| K["Speicherstand dokumentieren\nLaden/Einspeisen = -Speicher\nFlexkraftwerk = Speicher - Differenz\nBerechne Restkapazität\nSpeicher = 0"]
+    I -->|Nein| L["Speicher -= Differenz\nLaden/Einspeisen = -Differenz"]
+    
+    J --> M{"Flexkraftwerk Kapazität - |Differenz| > 0?"}
+    M -->|Ja| N["Flexkraftwerk = -Differenz\nBerechne Restkapazität"]
+    M -->|Nein| O["Flexkraftwerk = -Maximalkapazität\nRestkapazität = 0"]
+    
+    G --> P["Ende"]
+    H --> P
+    F --> P
+    K --> P
+    L --> P
+    N --> P
+    O --> P
