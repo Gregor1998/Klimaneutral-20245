@@ -23,7 +23,7 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
 
 
 
-    yearly_generation = directory_yearly_generation.get(2030)
+    yearly_generation = pd.DataFrame.from_dict(directory_yearly_generation.get(int(selectedYear)))
 
     # Überprüfe, ob die Spalten vorhanden sind
     required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik']
@@ -31,85 +31,65 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
     yearly_generation['Gesamterzeugung_EE'] = yearly_generation[required_columns].sum(axis=1)
         
     # Speichere die Ergebnisse in production_2030
-    production_2030 = yearly_generation[['Datum', 'Gesamterzeugung_EE']]
-    addTimeInformation(production_2030)
+    production_df = yearly_generation[['Datum', 'Gesamterzeugung_EE']]
+    addTimeInformation(production_df)
 
 
-    week_filtered_data_production = production_2030[
-        (production_2030['Week'] == selectedWeek) &
-        (production_2030['Year'] == selectedYear)
+    week_filtered_data_production = production_df[
+        (production_df['Week'] == selectedWeek) &
+        (production_df['Year'] == selectedYear)
     ]
-    print(week_filtered_data_production)
+    #print(week_filtered_data_production)
     week_production_df = week_filtered_data_production[['Datum', 'Gesamterzeugung_EE']]
-    week_consumption_df['Datum'] = pd.to_datetime(week_consumption_df['Datum'])
+    week_production_df['Datum'] = pd.to_datetime(week_production_df['Datum'])
 
     # Speicherintegration
 
     resdidual_df = differenceBetweenDataframes(yearly_consumption, yearly_generation)
-    storage_df, flexipowerplant_df = StorageIntegration(resdidual_df, 83, 47)
+    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df = StorageIntegration(production_df, resdidual_df, 83, 47)
     addTimeInformation(storage_df)
     addTimeInformation(flexipowerplant_df)
+    addTimeInformation(storage_ee_combined_df)
+    addTimeInformation(all_combined_df)
 
     week_filtered_data_storage = storage_df[
         (storage_df['Year'] == selectedYear) & 
         (storage_df['Week'] == selectedWeek)
     ]
 
+    data_storage_df = week_filtered_data_storage[['Datum', 'Laden/Einspeisen in MWh']]
+    data_storage_df['Datum'] = pd.to_datetime(data_storage_df['Datum'])
+
     week_filtered_data_flex = flexipowerplant_df[
         (flexipowerplant_df['Year'] == selectedYear) & 
         (flexipowerplant_df['Week'] == selectedWeek)
     ]
-    #print("storage", week_filtered_data_storage)
 
-    # dataframe erstellen nur mit datum und gesamtverbrauch
-    week_storage_df = week_filtered_data_storage[['Datum', 'Laden/Einspeisen in kWh']]
-    week_storage_df['Datum'] = pd.to_datetime(week_storage_df['Datum'])
+    data_flex_df = week_filtered_data_flex[['Datum', 'Einspeisung in MWh']]
+    data_flex_df['Datum'] = pd.to_datetime(data_flex_df['Datum'])
 
-    # Merge the dataframes on 'Datum' column
-    Storage_EE = pd.merge(yearly_generation[['Datum', 'Gesamterzeugung_EE']], storage_df[['Datum', 'Laden/Einspeisen in kWh']], on='Datum')
-     # Merge the dataframes on 'Datum' column
-    #Storage_flex_EE = pd.merge(Storage_EE[['Datum','Gesamterzeugung_EE', 'Laden/Einspeisen in kWh']], flexipowerplant_df[['Datum', 'Einspeisung in kWh']], on='Datum')
-    # Add the relevant columns
-    Storage_EE['Total_Energy'] = Storage_EE['Gesamterzeugung_EE'] - Storage_EE['Laden/Einspeisen in kWh']
-    # Add the relevant columns
-    #Storage_flex_EE['Total_Energy'] = Storage_flex_EE['Gesamterzeugung_EE'] + Storage_flex_EE['Laden/Einspeisen in kWh'] + Storage_flex_EE['Einspeisung in kWh']
-    # Add the 'Laden/Einspeisen in kWh' column from storage_df and 'Gesamterzeugung_EE' column from production_2030
-    combined_ee_storage_df = pd.merge(yearly_generation[['Datum', 'Gesamterzeugung_EE']], storage_df[['Datum', 'Laden/Einspeisen in kWh', 'Week', 'Year']], on='Datum')
-    combined_ee_storage_df['Erzeugung + Speicher in kWh'] = combined_ee_storage_df['Gesamterzeugung_EE'] - combined_ee_storage_df['Laden/Einspeisen in kWh']
-
-    #combined_ee_storage_flex_df = pd.merge(flexipowerplant_df[['Datum', 'Einspeisung in kWh']], combined_ee_storage_df['Datum', 'Erzeugung&Laden/Einspeisen in kWh','Week', 'Year'], on='Datum')
-    #combined_ee_storage_flex_df['Erzeugung&Laden/Einspeisen&Flex in kWh'] = combined_ee_storage_flex_df['Gesamterzeugung_EE'] + combined_ee_storage_flex_df['Laden/Einspeisen in kWh'] + combined_ee_storage_flex_df['Einspeisung in kWh']
-
-    # Create the new dataframe with the required columns
-    storage_ee_df = combined_ee_storage_df[['Datum', 'Erzeugung + Speicher in kWh', 'Week', 'Year']]
-
-    week_filtered_data_storage_ee = storage_ee_df[
-        (storage_ee_df['Year'] == selectedYear) & 
-        (storage_ee_df['Week'] == selectedWeek)
+    week_filtered_data_storage_ee_combined = storage_ee_combined_df[
+        (storage_ee_combined_df['Year'] == selectedYear) & 
+        (storage_ee_combined_df['Week'] == selectedWeek)
     ]
 
-    # dataframe erstellen nur mit datum und gesamtverbrauch
-    week_storage_ee_df = week_filtered_data_storage_ee[['Datum', 'Erzeugung + Speicher in kWh']]
-    week_storage_ee_df['Datum'] = pd.to_datetime(week_storage_ee_df['Datum'])
+    data_storage_ee_combined = week_filtered_data_storage_ee_combined[['Datum', 'Speicher + Erneuerbare in MWh']]
+    data_storage_ee_combined['Datum'] = pd.to_datetime(data_storage_ee_combined['Datum'])
 
-    # Create the new dataframe with the required columns
-    #storage_ee_flex_df = combined_ee_storage_df[['Datum', 'Erzeugung + Speicher + Flexible in kWh', 'Week', 'Year']]
+    week_filtered_data_all_combined = all_combined_df[
+        (all_combined_df['Year'] == selectedYear) & 
+        (all_combined_df['Week'] == selectedWeek)
+    ]
 
-    #week_filtered_data_storage_flex_ee = storage_ee_flex_df[
-    #    (storage_ee_df['Year'] == selectedYear) & 
-    #    (storage_ee_df['Week'] == selectedWeek)
-   # ]
+    data_all_combined = week_filtered_data_all_combined[['Datum', 'EE + Speicher + Flexible in MWh']]
+    data_all_combined['Datum'] = pd.to_datetime(data_all_combined['Datum'])
+    
+   
 
-    # dataframe erstellen nur mit datum und gesamtverbrauch
-    #week_storage_ee_flex_df = week_filtered_data_storage_flex_ee[['Datum', 'Erzeugung + Speicher in kWh']]
-    #week_storage_ee_flex_df['Datum'] = pd.to_datetime(week_storage_ee_flex_df['Datum'])
-
-    #print(week_storage_df)
-    #print(week_storage_ee_df)
-    create_week_comparison(selectedYear, selectedWeek, week_consumption_df, week_production_df, week_storage_df, week_storage_ee_df)
+    create_week_comparison(selectedYear, selectedWeek, week_consumption_df, week_production_df, data_storage_df, data_storage_ee_combined, data_flex_df, data_all_combined)
 
 
-def create_week_comparison(year, week, consumption_data, production_data, storage_data=None, storage_ee_data=None):
+def create_week_comparison(year, week, consumption_data, production_data, storage_data=None, flex_data=None, storage_ee_data=None, all_combined_data=None):
     # TODO:spaltenname der verglichen werden soll mitübergeben
     
     # Assuming your dataframes have columns 'Date' and 'Energy'
@@ -121,13 +101,21 @@ def create_week_comparison(year, week, consumption_data, production_data, storag
     # Plot production
     plt.plot(production_data['Datum'], production_data.iloc[:, 1], label=production_data.columns[1], marker=',')
 
-    # Plot storage
-    if(storage_ee_data is not None):
-        plt.plot(storage_ee_data['Datum'], storage_ee_data['Erzeugung + Speicher in kWh'], label='Erzeugung + Speicher', marker='o')
+    # Plot storage 
+    if(storage_data is not None):
+        plt.plot(storage_data['Datum'], storage_data['Laden/Einspeisen in MWh'], label='Speicher - Laden/Einspeisen', linewidth=1)
+
+    # Plot flex
+    if(flex_data is not None):
+        plt.plot(flex_data['Datum'], flex_data['Einspeisung in MWh'], label='Flexible', linewidth=1)
 
     # Plot storage plus ee
-    if(storage_data is not None):
-        plt.plot(storage_data['Datum'], storage_data['Laden/Einspeisen in kWh'], label='Laden/Einspeisen', marker='o')
+    if(storage_ee_data is not None):
+        plt.plot(storage_ee_data['Datum'], storage_ee_data['Speicher + Erneuerbare in MWh'], label='Erzeugung + Speicher', linewidth=1)
+
+    # Plot all combined
+    if(all_combined_data is not None):
+        plt.plot(all_combined_data['Datum'], all_combined_data['EE + Speicher + Flexible in MWh'], label='Erzeugung + Speicher + Flexible', linewidth=1)
 
     
      # Customize x-axis to show one tick per day
@@ -135,6 +123,7 @@ def create_week_comparison(year, week, consumption_data, production_data, storag
     plt.gca().set_xticks(unique_dates)  # Set ticks to these dates
     formatted_labels = [date.strftime('%d.%m.%Y') for date in unique_dates]  # Format labels
     plt.gca().set_xticklabels(formatted_labels, rotation=45, ha='right')  # Set labels and rotate
+    plt.legend(fontsize=12, loc='upper left', bbox_to_anchor=(1, 1))  # Move legend outside the plot
 
     plt.gcf().autofmt_xdate()
 
