@@ -94,7 +94,25 @@ all_projections = {}
 for category, rates in growth_rates.items():
     all_projections[category] = {}
     for scenario in scenarios:
-        projections = project_growth_scenario(start_values[category], rates[scenario], start_year_growths_rates, end_year)
+        if scenario == 'best':
+            if category == 'Photovoltaik':
+                projections = pd.DataFrame({
+                    'year': np.arange(2023, 2031),
+                    'projected_capacity': [82443, 88000, 108000, 128000, 150000, 172000, 193500, 215000]
+                })
+            elif category == 'Wind Onshore':
+                projections = pd.DataFrame({
+                    'year': np.arange(2023, 2031),
+                    'projected_capacity': [61017, 69000, 76500, 84000, 91500, 99000, 107000, 115000]
+                })
+            elif category == 'Wind Offshore':
+                projections = pd.DataFrame({
+                    'year': np.arange(2023, 2031),
+                    'projected_capacity': [8458, 11535, 14613, 17690, 20768, 23845, 26923, 30000]
+                })
+        else:
+            projections = project_growth_scenario(start_values[category], rates[scenario], start_year_growths_rates, end_year)
+        
         filename = f'{output_dir}{category}_{scenario}_projection.csv'
         projections.to_csv(filename, index=False)
         all_projections[category][scenario] = projections
