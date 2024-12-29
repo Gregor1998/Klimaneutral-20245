@@ -1,4 +1,6 @@
 from utils.addTimeInformation import addTimeInformation
+from typing import override
+import pdb
 
 """
 class Extrapolation: #Erstellt ein Objekt, welches ein DataFrame mitbekommt, und bestimmte werte aus diesen DataFrame Multipliziert
@@ -53,7 +55,7 @@ class Extrapolation:
 
         self.multiply()
         self.update_year()
-        # addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
+        addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
     def multiply(self):
         if self.factor_OnShore is not None:
@@ -69,3 +71,45 @@ class Extrapolation:
         # Ändern der Jahreskomponente in der "Datum"-Spalte
         self.df["Datum"] = self.df["Datum"].apply(lambda x: x.replace(year=self.year))
         self.df["Year"] = self.year
+
+
+class Extrapolation_Consumption(Extrapolation):
+    
+    def __init__(self, df, year,  factor_OnShore=None, factor_OffShore=None, factor_Photo=None, factor_Consumption=None, lastprofil_dict=None, lastprofil_waermepumpe_year = None):
+        super().__init__(df, year, None, None, None, factor_Consumption=factor_Consumption)
+
+        self.lastprofil = lastprofil_dict
+        self.waermepumpe = lastprofil_waermepumpe_year
+        
+        self.apply_lastprofile()
+        addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
+
+
+    def apply_lastprofile(self):
+        saturday = ["6"]  # Samstag
+        sunday = ["7"]  # Sonntag
+        workday = ["1", "2", "3", "4", "5"]  # Montag bis Freitag
+
+        for idx, row in self.df.iterrows():
+            weekday = row['Weekday']
+            lp = None
+           
+            if weekday in saturday:
+                lp = self.lastprofil['saturday']
+            elif weekday in sunday:
+                lp = self.lastprofil['sunday']
+            elif weekday in workday:
+                lp = self.lastprofil['workday']
+            else:
+                continue
+
+        
+            # Berechnen Sie den Index im Lastprofil-DataFrame
+            lastprofil_idx = idx % len(lp)
+
+            # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
+            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + self.waermepumpe.loc[idx, 'Verbrauch'])
+
+
+        #self.df.drop(columns=['Weekday'], inplace=True)
+            

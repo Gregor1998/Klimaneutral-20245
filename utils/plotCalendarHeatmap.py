@@ -15,5 +15,7 @@ def plotCalendarHeatmap(df, title, colName, linewidths=0.01):
     plt.title(title)
     plt.xlabel('Tag')
     plt.ylabel('Monat')
-
+    plt.savefig('assets/plots/heatmap.png')
     plt.show()
+
+    
