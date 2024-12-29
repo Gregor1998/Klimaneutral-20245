@@ -95,7 +95,9 @@ for category, rates in growth_rates.items():
     all_projections[category] = {}
     for scenario in scenarios:
         projections = project_growth_scenario(start_values[category], rates[scenario], start_year_growths_rates, end_year)
-        filename = f'{output_dir}{category}_{scenario}_projection.csv'
+
+        filename = f'{output_dir}{scenario}_case_{category}_projections.csv'
+
         projections.to_csv(filename, index=False)
         all_projections[category][scenario] = projections
 

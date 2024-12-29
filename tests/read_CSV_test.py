@@ -13,14 +13,14 @@ def test_verbrauch_csv_existence():
         mock_path_exists.side_effect = lambda path: "2023" in path
 
         # Call the function with "Verbrauch" mode
-        result = getData("Verbrauch")
+        result = getData("Consumption")
 
         # Check that the result includes 2023 since the file "exists"
         assert 2023 in result, "Expected year 2023 to be in the result."
 
         # Verify the correct file path was checked
         expected_path = os.path.join(
-            "CSV/Verbrauch/",
+            "CSV/Consumption/",
             "Realisierter_Stromverbrauch_202301010000_202401010000_Viertelstunde.csv"
         )
         mock_path_exists.assert_any_call(expected_path)
@@ -31,8 +31,8 @@ def test_verbrauch_csv_existence():
 def test_read_SMARD_data_erzeugung():
     from utils.read_CSV import read_SMARD_data
 
-    path = "CSV/Realisierte_Erzeugung_202301010000_202401010000_Viertelstunde.csv"
-    result = read_SMARD_data(path, "Erzeugung")
+    path = "CSV/Generation/Realisierte_Erzeugung_202301010000_202401010000_Viertelstunde.csv"
+    result = read_SMARD_data(path, "Generation")
     # Tatsächliche Spalten im DataFrame
     result_columns = list(result.columns)
 
@@ -42,8 +42,8 @@ def test_read_SMARD_data_erzeugung():
 def test_read_SMARD_data_verbrauch():
     from utils.read_CSV import read_SMARD_data
 
-    path = "CSV/Verbrauch/Realisierter_Stromverbrauch_202301010000_202401010000_Viertelstunde.csv"
-    result = read_SMARD_data(path, "Verbrauch")
+    path = "CSV/Consumption/Realisierter_Stromverbrauch_202301010000_202401010000_Viertelstunde.csv"
+    result = read_SMARD_data(path, "Consumption")
     # Tatsächliche Spalten im DataFrame
     result_columns = list(result.columns)
 

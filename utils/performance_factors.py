@@ -17,7 +17,7 @@ def performance_factors(directoryGeneration,directoryInstalled):
             OffShore_factor = directoryInstalled[year]["Wind Offshore"].iloc[0] * 0.25
 
         #Anlegung eines leeren DataFrames für die Performance Faktoren pro Viertelstunde
-        
+    
         performance_factors = pd.DataFrame(columns=["Datum","Photovoltaik", "Wind Onshore", "Wind Offshore"])
         performance_factors["Datum"] = directoryGeneration[year]["Datum"]  
 
@@ -42,7 +42,6 @@ def performance_factors(directoryGeneration,directoryInstalled):
                 performance_factors["Wind Offshore"] = directoryGeneration[year]["Wind Offshore"] / OffShore_factor
 
             
-
         #Hinzufügen des DataFrames für das entsprechende Jahr zum Directory
         directory_performance_factors[year] = performance_factors
 
