@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from utils.cleanse_dataframes import cleanse_dataframes
 
 def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directory_yearly_consumption):
     # Erstelle einen leeren DataFrame, um die Ergebnisse zu speichern
@@ -8,8 +9,11 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
     # Iteriere durch jedes Jahr in den Dictionaries
     for year in range(startYear, endYear):  # Beispiel: von 2023 bis 2031
         if year in directory_yearly_generation and year in directory_yearly_consumption:
-            production_df = directory_yearly_generation[year]
-            consumption_df = directory_yearly_consumption[year]
+            #production_df = directory_yearly_generation[year]
+            #consumption_df = directory_yearly_consumption[year]
+
+            # Bereinigen der DataFrames von Schaltjahren oder Zeitumstellung
+            consumption_df, production_df = cleanse_dataframes(directory_yearly_consumption[year], directory_yearly_generation[year])
             
             # Berechne die Gesamterzeugung_EE
             required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik']
@@ -45,6 +49,8 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
     plt.ylabel('Summe der Differenz')
     plt.title('Jährliche Summe der Differenz zwischen Verbrauch und Produktion')
     plt.grid(True)
-
+    plt.savefig('assets/plots/residual_diagramm.png')
     # Diagramm anzeigen
     plt.show()
+
+    
