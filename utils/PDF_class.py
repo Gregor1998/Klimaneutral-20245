@@ -2,6 +2,8 @@ from fpdf import FPDF
 
 class PDF(FPDF):
     def header(self):
+        if self.page_no() == 1:
+            return
         # Logo
         # Berechne die x-Position des Bildes, um es in die rechte Ecke zu verschieben
         image_width = 20
@@ -60,6 +62,10 @@ class PDF(FPDF):
         self.image(image_path, x, self.get_y(), w, h)
         self.ln(h + 5)  # Zeilenumbruch nach dem Bild
 
+    def add_cover_page(self, image_path):
+            self.add_page()
+            self.image(image_path, 0, 0, self.w, self.h)
+            
     def add_table(self, data):
         self.set_font('Arial', '', 12)
         col_width = self.w / 2.5  # Breite der Spalten
