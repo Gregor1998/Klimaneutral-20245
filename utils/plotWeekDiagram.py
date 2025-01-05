@@ -52,7 +52,7 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
     resdidual_df = differenceBetweenDataframes(cleaned_yearly_consumption, cleaned_yearly_generation)
 
 
-    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df = StorageIntegration(production_df, resdidual_df, 83, 47)
+    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df = StorageIntegration(production_df, resdidual_df, 46, 83, 47)
 
 
     addTimeInformation(storage_df)
@@ -114,7 +114,7 @@ def create_week_comparison(year, week, consumption_data, production_data, fileNa
     plt.figure(figsize=(10, 6))
 
     # Plot consumption
-    plt.plot(consumption_data['Datum'], consumption_data.iloc[:, 1], label=production_data.columns[1], marker=',')
+    plt.plot(consumption_data['Datum'], consumption_data.iloc[:, 1], label=consumption_data.columns[1], marker=',')
 
     # Plot production
     plt.plot(production_data['Datum'], production_data.iloc[:, 1], label=production_data.columns[1], marker=',')
