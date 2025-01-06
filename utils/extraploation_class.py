@@ -90,23 +90,31 @@ class Extrapolation_Consumption(Extrapolation):
 
         for idx, row in self.df.iterrows():
             weekday = row['Weekday']
-            lp = None
+            lp_wohnen, lp_buro, lp_public = None, None, None
            
             if weekday in saturday:
-                lp = self.lastprofil['saturday']
+                lp_wohnen = self.lastprofil['Wohnen']['saturday']
+                lp_buro = self.lastprofil['Büro']['saturday']
+                lp_public = self.lastprofil['Öffentliche_Ladepunkte']['saturday']
             elif weekday in sunday:
-                lp = self.lastprofil['sunday']
+                lp_wohnen = self.lastprofil['Wohnen']['sunday']
+                lp_buro = self.lastprofil['Büro']['sunday']
+                lp_public = self.lastprofil['Öffentliche_Ladepunkte']['sunday']
             elif weekday in workday:
-                lp = self.lastprofil['workday']
+                lp_wohnen = self.lastprofil['Wohnen']['workday']
+                lp_buro = self.lastprofil['Büro']['workday']
+                lp_public = self.lastprofil['Öffentliche_Ladepunkte']['workday']
             else:
                 continue
 
         
             # Berechnen Sie den Index im Lastprofil-DataFrame
-            lastprofil_idx = idx % len(lp)
+            lastprofil_idx = idx % len(lp_wohnen)
+
+            lp_eautos_sum = lp_wohnen.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_buro.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_public.loc[lastprofil_idx, 'Strombedarf (kWh)']
 
             # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
-            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + self.waermepumpe.loc[idx, 'Verbrauch'])
+            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp_eautos_sum/1000) + self.waermepumpe.loc[idx, 'Verbrauch'])
 
 
         #self.df.drop(columns=['Weekday'], inplace=True)
