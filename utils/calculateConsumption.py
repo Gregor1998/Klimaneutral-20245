@@ -29,6 +29,7 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
     
 
     # lastprofil abziehen
+    charging_areas = ['Wohnen', 'Büro', 'Öffentliche_Ladepunkte']
     base_lastprofile_eauto = lastprofile_dict[2023].copy()
     saturday = ["6"]  # Samstag
     sunday = ["7"]  # Sonntag
@@ -36,25 +37,31 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
 
     for idx, row in directory_yearly_consumption[2023].iterrows():
         weekday = row['Weekday']
-        lp = None
+        lp_wohnen, lp_buro, lp_public = None, None, None
         
         if weekday in saturday:
-            lp = base_lastprofile_eauto['saturday']
+            lp_wohnen = base_lastprofile_eauto['Wohnen']['saturday']
+            lp_buro = base_lastprofile_eauto['Büro']['saturday']
+            lp_public = base_lastprofile_eauto['Öffentliche_Ladepunkte']['saturday']
         elif weekday in sunday:
-            lp = base_lastprofile_eauto['sunday']
+            lp_wohnen = base_lastprofile_eauto['Wohnen']['sunday']
+            lp_buro = base_lastprofile_eauto['Büro']['sunday']
+            lp_public = base_lastprofile_eauto['Öffentliche_Ladepunkte']['sunday']
         elif weekday in workday:
-            lp = base_lastprofile_eauto['workday']
+            lp_wohnen = base_lastprofile_eauto['Wohnen']['workday']
+            lp_buro = base_lastprofile_eauto['Büro']['workday']
+            lp_public = base_lastprofile_eauto['Öffentliche_Ladepunkte']['workday']
         else:
             continue
 
 
         # Berechnen Sie den Index im Lastprofil-DataFrame
-        lastprofil_idx = idx % len(lp)
+        lastprofil_idx = idx % len(lp_wohnen)
 
-        print(lp)
-
-        # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
-        row['Gesamtverbrauch'] -= ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + base_heatpump_lp.loc[idx, 'Verbrauch'])
+        # aufsummieren -> aus allen drei lastprofiltypen soll der gesamtverbrauch abgezogen werden
+        lp_eautos_sum = lp_wohnen.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_buro.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_public.loc[lastprofil_idx, 'Strombedarf (kWh)']
+        #jetzt eautos lastprofile und danach wärmepumpen vom Gesamtverbrauch abziehen
+        row['Gesamtverbrauch'] -= ((lp_eautos_sum/1000) + base_heatpump_lp.loc[idx, 'Verbrauch in MWh'])
 
 
     for year in range(2024,2031):
