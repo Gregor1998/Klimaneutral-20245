@@ -65,8 +65,7 @@ def read_SMARD_data(path, mode):
     
     elif mode == "Installed":
         
-    
-    
+       
         #Umbenennung der Spalten
         df.rename(columns={
             "Datum von":"Datum",
@@ -133,8 +132,6 @@ def read_SMARD_data(path, mode):
         if num_columns != 16:
             raise ValueError("Number of columns in Population data is not 16")
 
-
-
     else :
         print("Mode not found")
 
@@ -152,7 +149,7 @@ def read_SMARD_data(path, mode):
 
 
 
-def getData(mode, optional_path = None):
+def getData(mode, year_cons=None, start_year_ee=None, end_year_ee=None, optional_path = None):
     dataFrames = {}
 
     if mode == "Consumption":
@@ -160,7 +157,7 @@ def getData(mode, optional_path = None):
         path_var = "CSV/Consumption/" #Pfad auf den Ordner, um später durch die Datein zu navigieren
 
         #Schleife für die Jahre 2015-2023 und Einlesen der Datei
-        for year in range(2023,2024): # hier könnte man später sich die Jahre auch vom User geben lassen, welche Jahre er gerne eingelesen haben möchte
+        for year in range(year_cons, year_cons+1): # hier könnte man später sich die Jahre auch vom User geben lassen, welche Jahre er gerne eingelesen haben möchte
             #Dateipfad für das entsprechende Jahr
             file_path = os.path.join(path_var, f"Realisierter_Stromverbrauch_{year}01010000_{year+1}01010000_Viertelstunde.csv")
             if os.path.exists(file_path):   #Falls dieser zusammengesetze Pfad existiert,...
@@ -174,7 +171,7 @@ def getData(mode, optional_path = None):
         path_var = "CSV/Generation/" #Pfad auf den Ordner, um später durch die Datein zu navigieren
 
         #Schleife für die Jahre 2015-2023 und Einlesen der Datei
-        for year in range(2015,2024): # hier könnte man später sich die Jahre auch vom User geben lassen, welche Jahre er gerne eingelesen haben möchte
+        for year in range(start_year_ee, end_year_ee+1): # hier könnte man später sich die Jahre auch vom User geben lassen, welche Jahre er gerne eingelesen haben möchte
             #Dateipfad für das entsprechende Jahr
             file_path = os.path.join(path_var, f"Realisierte_Erzeugung_{year}01010000_{year+1}01010000_Viertelstunde.csv")
             if os.path.exists(file_path):   #Falls dieser zusammengesetze Pfad existiert,...
@@ -186,7 +183,7 @@ def getData(mode, optional_path = None):
 
     elif mode == "Installed":
         path_var = "CSV/Installed/"
-        for year in range(2015,2024):
+        for year in range(start_year_ee, end_year_ee + 1):
             file_path = os.path.join(path_var, f"Installierte_Erzeugungsleistung_{year}01010000_{year+1}01010000_Jahr.csv")
             if os.path.exists(file_path):
                 dataFrames[year] = read_SMARD_data(file_path, "Installed")
