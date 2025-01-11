@@ -1,6 +1,5 @@
 from utils.addTimeInformation import addTimeInformation
-from typing import override
-import pdb
+
 
 """
 class Extrapolation: #Erstellt ein Objekt, welches ein DataFrame mitbekommt, und bestimmte werte aus diesen DataFrame Multipliziert
