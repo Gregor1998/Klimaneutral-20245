@@ -54,7 +54,7 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
         print(lp)
 
         # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
-        row['Gesamtverbrauch'] -= ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + base_heatpump_lp.loc[idx, 'Verbrauch'])
+        row['Gesamtverbrauch'] -= ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + base_heatpump_lp.loc[idx, 'Verbrauch in MWh'])
 
 
     for year in range(2024,2031):

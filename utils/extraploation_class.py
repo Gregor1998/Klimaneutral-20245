@@ -107,7 +107,7 @@ class Extrapolation_Consumption(Extrapolation):
             lastprofil_idx = idx % len(lp)
 
             # Fügen Sie den Wert aus dem Lastprofil-DataFrame hinzu
-            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + self.waermepumpe.loc[idx, 'Verbrauch'])
+            self.df.loc[idx, 'Gesamtverbrauch'] += ((lp.loc[lastprofil_idx, 'Strombedarf (kWh)']/1000) + self.waermepumpe.loc[idx, 'Verbrauch in MWh'])
 
 
         #self.df.drop(columns=['Weekday'], inplace=True)

@@ -140,7 +140,7 @@ def read_SMARD_data(path, mode):
 
     #addTimeInformation(df)
     #Formatierung der Datumstpalte
-    if mode not in ["Heatpump", "Temperature","Population"]:
+    if mode not in ["Installed", "Heatpump", "Temperature","Population"]:
         df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
         
     if mode == "Heatpump":
