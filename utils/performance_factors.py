@@ -1,6 +1,6 @@
 import pandas as pd #type: ignore
 
-def performance_factors(directoryGeneration,directoryInstalled):
+def performance_factors(directoryGeneration, directoryInstalled):
     directory_performance_factors = {}
             #df.loc[row_indexer, "col"] = values`
     for year in range(2015,2024):
