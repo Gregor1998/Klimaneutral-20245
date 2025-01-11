@@ -10,7 +10,8 @@ from openpyxl.drawing.image import Image
 
 def process_opened_excel():
     # Aktive Excel-Arbeitsmappe abrufen
-    wb = xw.Book.caller()
+    
+    wb = xw.Book.set_mock_caller()
     excel_file = wb.fullname  # Pfad zur geöffneten Datei
     szenarien = {}
 
@@ -48,7 +49,7 @@ def plot_example():
     plt.close()
 
 def insert_dynamic_content_with_xlwings():
-    wb = xw.Book("szenarioDefinition/szenario_parameter.xlsx")
+    wb = xw.Book("szenarioDefinition/szenario_parameter.xlsm")
     sheet = wb.sheets["Szenario 1 - Best_Best"]
     
     # Text hinzufügen
@@ -59,7 +60,7 @@ def insert_dynamic_content_with_xlwings():
     plot_example()
     sheet.pictures.add("diagramm.png", top=sheet.range("A17").top, left=sheet.range("A17").left)
     
-    wb.save("szenarioDefinition/szenario_parameter.xlsx")
+    wb.save("szenarioDefinition/szenario_parameter.xlsm")
     wb.close()
 
 process_opened_excel()
