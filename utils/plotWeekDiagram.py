@@ -5,6 +5,7 @@ from matplotlib.dates import DayLocator, DateFormatter
 from utils.addTimeInformation import addTimeInformation
 from utils.calcDifference_storage_flexpowerplant import differenceBetweenDataframes, StorageIntegration
 from utils.cleanse_dataframes import cleanse_dataframes
+from szenarioDefinition.szenario import*
 
 def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, directory_yearly_generation, fileName=None):
     yearly_consumption = pd.DataFrame.from_dict(consumption_extrapolation.get(int(selectedYear)))
@@ -27,7 +28,7 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
     yearly_generation = pd.DataFrame.from_dict(directory_yearly_generation.get(int(selectedYear)))
 
     # Überprüfe, ob die Spalten vorhanden sind
-    required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik']
+    required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik', 'Wasserkraft', 'Sonstige Erneuerbare', 'Biomasse']
     # Berechne die Summe der gewünschten Spalten für jede 15-Minuten-Periode
     yearly_generation['Gesamterzeugung_EE'] = yearly_generation[required_columns].sum(axis=1)
         
@@ -52,7 +53,7 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
     resdidual_df = differenceBetweenDataframes(cleaned_yearly_consumption, cleaned_yearly_generation)
 
 
-    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df = StorageIntegration(production_df, resdidual_df, 83, 47)
+    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df , _, _= StorageIntegration(production_df, resdidual_df, max_power_storage, max_storage_capicity, max_power_flexipowerplant)
 
 
     addTimeInformation(storage_df)

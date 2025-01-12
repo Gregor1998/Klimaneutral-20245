@@ -16,7 +16,7 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
             consumption_df, production_df = cleanse_dataframes(directory_yearly_consumption[year], directory_yearly_generation[year])
             
             # Berechne die Gesamterzeugung_EE
-            required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik']
+            required_columns = ['Wind Offshore', 'Wind Onshore', 'Photovoltaik', 'Wasserkraft', 'Sonstige Erneuerbare', 'Biomasse']
             if all(column in production_df.columns for column in required_columns):
                 production_df['Gesamterzeugung_EE'] = production_df[required_columns].sum(axis=1)
             else:

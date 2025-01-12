@@ -69,6 +69,9 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
 
+    print("Test Datumsspalte")
+    print(difference_df["Datum"])
+
     storage_df = pd.DataFrame()
     storage_df['Datum'] = difference_df['Datum']
     storage_df['Differenz in MWh'] = difference_df['Differenz in MWh']

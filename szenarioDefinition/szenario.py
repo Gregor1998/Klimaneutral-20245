@@ -39,8 +39,12 @@ start_year_simulatuion = 2024 # start year of simulation
 end_year_simulation = 2030 # end year of simulation
 base_year_generation = 2023 #Basisjahr für den Verlauf von Wasserkraft, Sonstige Erneuerbare und Biomasse
 case_Temperature = "BestCase" #oder AverageCase oder WorstCase
-selected_week_comparison_load_profile_consumption = '22' # selected week for comparison of load profile + consumption and consumption
-selected_year_comparison_load_profile_consumption = '2030' # selected year for comparison of load profile + consumption and consumption
+selected_week_plot = '22' # selected week for comparison of load profile + consumption and consumption
+selected_year_plot = '2030' # selected year for comparison of load profile + consumption and consumption
+max_power_storage = 83
+max_storage_capicity = 47
+max_power_flexipowerplant = 100
+
 
 
 # Ausgabe zur Überprüfung
