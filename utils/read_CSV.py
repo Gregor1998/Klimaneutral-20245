@@ -156,7 +156,7 @@ def getData(mode, year_cons=None, start_year_ee=None, end_year_ee=None, optional
          # Dictionary für die df für jedes Jahr
         path_var = "CSV/Consumption/" #Pfad auf den Ordner, um später durch die Datein zu navigieren
 
-        #Schleife für die Jahre 2015-2023 und Einlesen der Datei
+        #Schleife für das BasisJahr und Einlesen der Datei
         for year in range(year_cons, year_cons+1): # hier könnte man später sich die Jahre auch vom User geben lassen, welche Jahre er gerne eingelesen haben möchte
             #Dateipfad für das entsprechende Jahr
             file_path = os.path.join(path_var, f"Realisierter_Stromverbrauch_{year}01010000_{year+1}01010000_Viertelstunde.csv")

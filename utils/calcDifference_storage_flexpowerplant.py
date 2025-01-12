@@ -12,7 +12,7 @@ def differenceBetweenDataframes(df1, df2):
         difference_df['Day'] = difference_df['Datum'].dt.strftime('%d')
 
         # Find the longest period of negative and positive differences
-        longest_negative_df, longest_positive_df, sums_df = calculateLongestPeriods(difference_df)
+        longest_negative_df, longest_positive_df, sums_df, flex_demand = calculateLongestPeriods(difference_df)
 
         return difference_df, longest_negative_df, longest_positive_df, sums_df
     else:

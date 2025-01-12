@@ -48,22 +48,22 @@ def temperatureRegion(case_Temperature):
 
     #Einlesen der CSV der unterschiedlichen Regionen für die Temperatur nach case
     path_nord=case_Temperature +"_Temperature_North.csv"
-    df_north_temperature = getData("Temperature", path_nord)
+    df_north_temperature = getData("Temperature",None, None,None, path_nord)
     df_north_temperature = df_north_temperature.round(0).astype(int) #Runden der Temperaturwerte und Umwandeln in Integer
     directoryRegionTemperature["North"] = df_north_temperature #Dataframe wird in das Dictionary für Region Nord eingefügt
 
     path_west = case_Temperature + "_Temperature_West.csv"
-    df_west_temperature = getData("Temperature", path_west)
+    df_west_temperature = getData("Temperature", None, None, None ,path_west)
     df_west_temperature = df_west_temperature.round(0).astype(int) #Runden der Temperaturwerte und Umwandeln in Integer
     directoryRegionTemperature["West"] = df_west_temperature #Dataframe wird in das Dictionary für Region West eingefügt
 
     path_south = case_Temperature + "_Temperature_South.csv"
-    df_south_temperature = getData("Temperature", path_south)
+    df_south_temperature = getData("Temperature", None, None, None, path_south)
     df_south_temperature = df_south_temperature.round(0).astype(int) #Runden der Temperaturwerte und Umwandeln in Integer
     directoryRegionTemperature["South"] = df_south_temperature #Dataframe wird in das Dictionary für Region Süd eingefügt
 
     path_east = case_Temperature + "_Temperature_East.csv"
-    df_east_temperature = getData("Temperature", path_east)
+    df_east_temperature = getData("Temperature",None, None, None,  path_east)
     df_east_temperature = df_east_temperature.round(0).astype(int) #Runden der Temperaturwerte und Umwandeln in Integer
     directoryRegionTemperature["East"] = df_east_temperature #Dataframe wird in das Dictionary für Region Ost eingefügt
     

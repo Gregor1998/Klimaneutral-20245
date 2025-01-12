@@ -1,8 +1,8 @@
 import pandas as pd
 from utils.addTimePerformance import addTimePerformance
-from szenarioDefinition.szenario_new import *
+from szenarioDefinition.szenario import *
 
-def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, dataFrame_performance, dataFrame_generation_start_year,  gridlost, start_year, end_year):
+def calculate_future_generation(dataFrame_performance, dataFrame_generation_start_year,  gridlost, start_year, end_year):
     # Erstellung eines leeren Dictionaries für die Generation
     directoryGeneration = {}
 
@@ -11,9 +11,9 @@ def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, da
     df_generation_start_year = dataFrame_generation_start_year.copy()
 
     # Pfade zu den CSV-Dateien, je nach Case
-    filepath_PV = f'CSV/Installed/{case_PV}_Photovoltaik_projections.csv'
-    filepath_Onshore = f'CSV/Installed/{case_WindOnshore}_Wind Onshore_projections.csv'
-    filepath_Offshore = f'CSV/Installed/{case_WindOffshore}_Wind Offshore_projections.csv'
+    filepath_PV = f'CSV/Installed/PV_projections.csv'
+    filepath_Onshore = f'CSV/Installed/Onshore_projections.csv'
+    filepath_Offshore = f'CSV/Installed/Offshore_projections.csv'
 
     # Einlesen der CSV-Dateien
     df_PV = pd.read_csv(filepath_PV)
@@ -25,11 +25,12 @@ def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, da
     df_filtered_Onshore = df_Onshore[df_Onshore['year'] >= start_year].reset_index(drop=True)
     df_filtered_Offshore = df_Offshore[df_Offshore['year'] >= start_year].reset_index(drop=True)
 
+
     # Zusammenführen der Daten
     df_combined = pd.concat([
         df_filtered_PV['year'],
-        df_filtered_PV['projected_capacity'],
-        df_filtered_Onshore['projected_capacity'],
+        df_filtered_PV['predicted_capacity'],
+        df_filtered_Onshore['predicted_capacity'],
         df_filtered_Offshore['projected_capacity']
     ], axis=1)
     df_combined.columns = ['Jahr', 'Photovoltaik', 'Wind Onshore', 'Wind Offshore']
@@ -79,8 +80,19 @@ def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, da
         # Netzverluste einbeziehen
         combined_generation *= gridlost # aus szenarioDefinition/szenario.py
 
-        addTimePerformance(combined_generation, year)
+        #Überprüfe, ob alle Spalten vorhanden sind
+        required_columns = ['Photovoltaik', 'Wind Onshore', 'Wind Offshore', 'Wasserkraft', 'Biomasse', 'Sonstige Erneuerbare']
+        if all(column in combined_generation.columns for column in required_columns):
+            # Berechnung der Gesamtsumme
+            combined_generation['Gesamterzeugung_EE'] = combined_generation[required_columns].sum(axis=1)
 
+            
+        else:
+            raise ValueError(f'Nicht alle Spalten vorhanden: {required_columns}')
+        
+        # Hinzufügen der Zeitinformationen
+        addTimePerformance(combined_generation, year)
+        
         # Speichern des Jahres-DataFrames in das Dictionary
         directoryGeneration[year] = combined_generation
 
