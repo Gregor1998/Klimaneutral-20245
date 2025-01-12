@@ -1,8 +1,10 @@
 import xlwings as xw
+import papermill as pm
 import pandas as pd
 import os
 from pathlib import Path
 
+"""
 def process_opened_excel(wb):
     # Aktive Excel-Arbeitsmappe abrufen
     
@@ -44,18 +46,64 @@ def process_opened_excel(wb):
     image_path = os.path.join(base_dir, 'assets', 'plots', 'heatmap.png')  # Build the full path
     
     new_sheet.pictures.add(image_path, top=wb.sheets[0]["F5"].top, left=wb.sheets[0]["F5"].left,width=300,height=200)
+"""
+
 
 
 
     
-# Szenarien ausgeben zur Kontrolle
+def read_sheet_parameters(sheet):
+    """Read simulation parameters and consumption development per year from the active Excel sheet."""
+    # Read the table into a DataFrame
+    df = sheet.range('A1').options(pd.DataFrame, header=1, expand='table').value
+
+    # Strip whitespace from column names to avoid issues
+    df.columns = df.columns.str.strip()
+
+    # Convert the 'Wert' column to a dictionary for simulation parameters
+    params = df['Wert'].to_dict()
+
+    # Drop rows with missing or non-finite values in 'Jahr'
+    df = df.dropna(subset=['Jahr'])
+
+    # Convert 'Jahr' to integers
+    df['Jahr'] = df['Jahr'].astype(int)
+
+    # Extract 'Verbrauchsentwicklung' per year with integer keys
+    consumption_development = {
+        int(year): value for year, value in df.set_index('Jahr')['Verbrauchsentwicklung'].dropna().to_dict().items()
+    }
+
+    # Add the consumption development to the params dictionary
+    params['consumption_development_per_year'] = consumption_development
+
+    return params
+
 
 def main():
     wb = xw.Book.caller()
-    sheet = wb.sheets[0]
-    
-    process_opened_excel(wb)
+    sheet = wb.sheets.active  # Get the active sheet (the one where the button was clicked)
+
+    # Read parameters from the active sheet
+    params = read_sheet_parameters(sheet) #-> Simulations Parameter
+    print(params)
+
+    # Path to your Jupyter Notebook
+    base_dir = Path(__file__).resolve().parent.parent
+    notebook_path = os.path.join(base_dir, "prototyp_2.ipynb")
+   # output_path = os.path.join(base_dir, "assets", "notebooks", "simulation_notebook_output.ipynb")
+
+    # Run the notebook with the parameters
+    pm.execute_notebook(
+        input_path=notebook_path,
+        output_path=notebook_path,
+        parameters=params
+    )
+
+    # Example: Write a confirmation message back to Excel
+    sheet["F1"].value = "Simulation completed!"
+    print("Notebook executed successfully!")
 
 if __name__ == "__main__":
-    xw.Book("IPJ.xlsm").set_mock_caller()
+    xw.Book("simulation_szenario.xlsm").set_mock_caller()
     main()

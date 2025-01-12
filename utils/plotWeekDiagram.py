@@ -49,10 +49,11 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
 
     # datframes von Zeitverschiebung und Zeitumstellung befreien
     cleaned_yearly_consumption, cleaned_yearly_generation = cleanse_dataframes(yearly_consumption, yearly_generation)
-    resdidual_df = differenceBetweenDataframes(cleaned_yearly_consumption, cleaned_yearly_generation)
+    resdidual_df,_,_,_ = differenceBetweenDataframes(cleaned_yearly_consumption, cleaned_yearly_generation)
 
 
-    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df = StorageIntegration(production_df, resdidual_df, 83, 47)
+
+    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df,_,_ = StorageIntegration(production_df, resdidual_df, 83, 47, 23) # TODO flexipowerplant_power had to be added, but is fake value 
 
 
     addTimeInformation(storage_df)

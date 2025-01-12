@@ -12,7 +12,7 @@ def differenceBetweenDataframes(df1, df2):
         difference_df['Day'] = difference_df['Datum'].dt.strftime('%d')
 
         # Find the longest period of negative and positive differences
-        longest_negative_df, longest_positive_df, sums_df = calculateLongestPeriods(difference_df)
+        longest_negative_df, longest_positive_df, sums_df, flex_demand = calculateLongestPeriods(difference_df)
 
         return difference_df, longest_negative_df, longest_positive_df, sums_df
     else:
@@ -68,6 +68,8 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     storage_max_power = storage_max_power * 10**3  # in MW
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
+
+    print(difference_df)
 
     storage_df = pd.DataFrame()
     storage_df['Datum'] = difference_df['Datum']
@@ -156,8 +158,9 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     new_difference_df.to_csv('./CSV/Storage_co/new_difference.csv', index=False)
     new_difference_storage_only_df.to_csv('./CSV/Storage_co/new_difference_storage_only.csv', index=False)
 
-    further_storage_demand_1_df, max_demand_2_df, sums_1_df, further_flex_demand_1 = calculateLongestPeriods(new_difference_df)
-    further_storage_demand_2_df, max_demand_2_df, sums_2_df, further_flex_demand_2 = calculateLongestPeriods(new_difference_storage_only_df)
+    #TODO FIX NOT WORKING
+    #further_storage_demand_1_df, max_demand_2_df, sums_1_df, further_flex_demand_1 = calculateLongestPeriods(new_difference_df)
+    #further_storage_demand_2_df, max_demand_2_df, sums_2_df, further_flex_demand_2 = calculateLongestPeriods(new_difference_storage_only_df)
 
     return storage_df, flexipowerplant_df, storage_ee_combined_df, all_combined_df, new_difference_df, new_difference_storage_only_df
     

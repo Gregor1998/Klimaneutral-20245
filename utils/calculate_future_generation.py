@@ -1,6 +1,6 @@
 import pandas as pd
 from utils.addTimePerformance import addTimePerformance
-from szenarioDefinition.szenario import *
+#from simulation_szenario import config
 
 def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, dataFrame_performance, dataFrame_generation_start_year):
     # Erstellung eines leeren Dictionaries für die Generation
@@ -77,7 +77,7 @@ def calculate_future_generation(case_PV, case_WindOnshore, case_WindOffshore, da
         })
 
         # Netzverluste einbeziehen
-        combined_generation *= netzverluste # aus szenarioDefinition/szenario.py
+        combined_generation *= 0.95279 # aus szenarioDefinition/szenario.py
 
         addTimePerformance(combined_generation, year)
 
