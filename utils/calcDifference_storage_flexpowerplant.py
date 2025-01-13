@@ -19,7 +19,15 @@ def differenceBetweenDataframes(df1, df2):
         return None
 
 def calculateLongestPeriods(difference_df):
-    difference_df['Sign'] = difference_df['Differenz in MWh'].apply(lambda x: 'Positive' if x > 0 else 'Negative')
+    # Überprüfen, ob die Spalte 'Differenz in MWh' existiert, andernfalls 'Restenergiebedarf in MWh' verwenden
+    if 'Differenz in MWh' in difference_df.columns:
+        energy_column = 'Differenz in MWh'
+    elif 'Restenergiebedarf in MWh' in difference_df.columns:
+        energy_column = 'Restenergiebedarf in MWh'
+    else:
+        raise ValueError("Neither 'Differenz in MWh' nor 'Restenergiebedarf in MWh' column found in the DataFrame")
+
+    difference_df['Sign'] = difference_df[energy_column].apply(lambda x: 'Positive' if x > 0 else 'Negative')
     difference_df['Group'] = (difference_df['Sign'] != difference_df['Sign'].shift()).cumsum()
 
     longest_negative_period = difference_df[difference_df['Sign'] == 'Negative'].groupby('Group').size().idxmax()
@@ -33,8 +41,8 @@ def calculateLongestPeriods(difference_df):
     longest_positive_df.to_csv('./CSV/Storage_co/longest_positive_period.csv', index=False)
 
     # Calculate the sum of the longest negative and positive periods
-    sum_longest_negative = longest_negative_df['Differenz in MWh'].sum()
-    sum_longest_positive = longest_positive_df['Differenz in MWh'].sum()
+    sum_longest_negative = longest_negative_df[energy_column].sum()
+    sum_longest_positive = longest_positive_df[energy_column].sum()
 
     # Calculate flex demand
     flex_demand = sum_longest_negative + sum_longest_positive
@@ -68,9 +76,10 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     storage_max_power = storage_max_power * 10**3  # in MW
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
+    
+    if isinstance(difference_df, tuple):
+        print("my_tuple ist ein Tupel")
 
-    print("Test Datumsspalte")
-    print(difference_df["Datum"])
 
     storage_df = pd.DataFrame()
     storage_df['Datum'] = difference_df['Datum']
