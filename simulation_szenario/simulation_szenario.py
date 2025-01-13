@@ -14,29 +14,54 @@ def clear_existing_images(sheet, image_filenames):
 
     
 def read_sheet_parameters(sheet):
-    """Read simulation parameters and consumption development per year from the active Excel sheet."""
+    """
+    Read simulation parameters and consumption development per year from the active Excel sheet.
+    """
     # Read the table into a DataFrame
     df = sheet.range('A1').options(pd.DataFrame, header=1, expand='table').value
 
-    # Strip whitespace from column names to avoid issues
+    # Strip whitespace from column names
     df.columns = df.columns.str.strip()
 
+    # If 'Variable' is already the index, we don't need to set it again
+    if df.index.name != 'Variable':
+        df.set_index('Variable', inplace=True)
+
     # Convert the 'Wert' column to a dictionary for simulation parameters
-    params = df['Wert'].to_dict()
+    params = df['Wert'].dropna().to_dict()
 
-    # Drop rows with missing or non-finite values in 'Jahr'
-    df = df.dropna(subset=['Jahr'])
+    # Convert whole number values in `params` to integers
+    for key, value in params.items():
+        if isinstance(value, float) and value.is_integer():
+            params[key] = int(value)
 
-    # Convert 'Jahr' to integers
-    df['Jahr'] = df['Jahr'].astype(int)
+    # Handle numeric conversion for specific keys (if needed)
+    numeric_keys = [
+        'onshore_development_rate', 'offshore_development_rate', 'pv_development_rate',
+        'CO2_factor_Kohle', 'CO2_factor_Gas', 'share_coal', 'share_gas',
+        'IST_installierte_waermepumpen', 'SOLL_installierte_waermepumpen', 'gridlost',
+        'growth_rate_pv', 'growth_rate_onshore', 'growth_rate_offshore',
+        'max_power_storage', 'max_storage_capicity', 'max_power_flexipowerplant'
+    ]
+    for key in numeric_keys:
+        if key in params and isinstance(params[key], str):  # Handle string values like "1,400,000.00"
+            try:
+                params[key] = float(params[key].replace('.', '').replace(',', '.'))
+                if params[key].is_integer():
+                    params[key] = int(params[key])
+            except ValueError:
+                print(f"Warning: Could not convert parameter {key} to numeric value.")
 
-    # Extract 'Verbrauchsentwicklung' per year with integer keys
-    consumption_development = {
-        int(year): value for year, value in df.set_index('Jahr')['Verbrauchsentwicklung'].dropna().to_dict().items()
-    }
+    # Extract 'Verbrauchsentwicklung' per year
+    if 'Jahr' in df.columns and 'Verbrauchsentwicklung' in df.columns:
+        # Drop rows with missing years or Verbrauchsentwicklung values
+        consumption_df = df.dropna(subset=['Jahr', 'Verbrauchsentwicklung'])
 
-    # Add the consumption development to the params dictionary
-    params['consumption_development_per_year'] = consumption_development
+        # Convert 'Jahr' to integers and create a dictionary
+        params['consumption_development_per_year'] = {
+            int(year): float(value)
+            for year, value in consumption_df[['Jahr', 'Verbrauchsentwicklung']].values
+        }
 
     return params
 
