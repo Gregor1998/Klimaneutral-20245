@@ -10,7 +10,10 @@ from sklearn.preprocessing import PolynomialFeatures
 # Füge den Pfad zu szenarioDefinition zum Python-Pfad hinzu
 path =  "./szenarioDefinition/szenario.py"
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from szenarioDefinition.szenario import *
+#from szenarioDefinition.szenario import *
+from utils import config
+
+print((config.params.growth_rate_PV))
 
 # Load the data
 data = pd.read_csv('./CSV/Installed/smard_installierte_leistungen.csv', delimiter=';')
@@ -65,7 +68,9 @@ regression_pv_start = 2013
 regression_on_start =  2013
 regression_off_start = 2016
 start_year_growths_rates = 2023
-end_year = end_year_extrapolation_installed_power
+end_year = config.params.end_year_extrapolation_installed_power
+
+print("hey there", config.params.end_year_extrapolation_installed_power)
 
 # Get 2023 start values
 start_values = {
@@ -95,7 +100,7 @@ all_projections = {}
 
 for category in ['PV', 'Onshore', 'Offshore']:
     all_projections[category] = {}
-    growth_rate = globals()[f'growth_rate_{category}']  # Use the growth rate from szenarien.py for each category
+    growth_rate = getattr(config.params, f"growth_rate_{category}")  # Use the growth rate from szenarien.py for each category
     projections = project_growth_scenario(start_values[category], growth_rate, start_year_growths_rates, end_year)
     
     filename = f'{output_dir}{category}_projections.csv'
@@ -115,7 +120,7 @@ plt.figure(figsize=(12, 8))
 # Plot PV projections
 plt.subplot(3, 1, 1)
 plt.plot(projections_pv['PV']['year'], projections_pv['PV']['predicted_capacity'], label='Regression')
-plt.plot(all_projections['PV']['year'], all_projections['PV']['projected_capacity'], label=f'PV {PV_scenario}')
+plt.plot(all_projections['PV']['year'], all_projections['PV']['projected_capacity'], label=f'PV {config.params.PV_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('PV Projections')
@@ -125,7 +130,7 @@ plt.grid(True)
 # Plot Wind Onshore projections
 plt.subplot(3, 1, 2)
 plt.plot(projections_on['Onshore']['year'], projections_on['Onshore']['predicted_capacity'], label='Regression')
-plt.plot(all_projections['Onshore']['year'], all_projections['Onshore']['projected_capacity'], label=f'Wind Onshore {Onshore_scenario}')
+plt.plot(all_projections['Onshore']['year'], all_projections['Onshore']['projected_capacity'], label=f'Wind Onshore {config.params.Onshore_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('Wind Onshore Projections')
@@ -135,7 +140,7 @@ plt.grid(True)
 # Plot Wind Offshore projections
 plt.subplot(3, 1, 3)
 plt.plot(projections_off['Offshore']['year'], projections_off['Offshore']['predicted_capacity'], label='Regression')
-plt.plot(all_projections['Offshore']['year'], all_projections['Offshore']['projected_capacity'], label=f'Wind Offshore {Offshore_scenario}')
+plt.plot(all_projections['Offshore']['year'], all_projections['Offshore']['projected_capacity'], label=f'Wind Offshore {config.params.Offshore_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
 plt.title('Wind Offshore Projections')

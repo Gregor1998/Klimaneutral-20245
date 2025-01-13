@@ -1,6 +1,10 @@
 import pandas as pd
 from utils.addTimePerformance import addTimePerformance
-from szenarioDefinition.szenario import *
+#from szenarioDefinition.szenario import *
+from utils import config
+
+
+print(config.params.gridlost)
 
 def calculate_future_generation(dataFrame_performance, dataFrame_generation_start_year,  gridlost, start_year, end_year):
     # Erstellung eines leeren Dictionaries für die Generation
@@ -77,8 +81,10 @@ def calculate_future_generation(dataFrame_performance, dataFrame_generation_star
             'Sonstige Erneuerbare': df_generation_start_year['Sonstige Erneuerbare']
         })
 
+        print(config.params.gridlost)
+
         # Netzverluste einbeziehen
-        combined_generation *= gridlost # aus szenarioDefinition/szenario.py
+        combined_generation *= config.params.gridlost # aus szenarioDefinition/szenario.py
 
         #Überprüfe, ob alle Spalten vorhanden sind
         required_columns = ['Photovoltaik', 'Wind Onshore', 'Wind Offshore', 'Wasserkraft', 'Biomasse', 'Sonstige Erneuerbare']

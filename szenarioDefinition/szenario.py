@@ -35,7 +35,7 @@ growth_rate_PV = df.loc[df['Variable'] == 'growth_rate_pv', 'Wert'].values[0]
 growth_rate_Onshore = df.loc[df['Variable'] == 'growth_rate_onshore', 'Wert'].values[0]
 growth_rate_Offshore = df.loc[df['Variable'] == 'growth_rate_offshore', 'Wert'].values[0]
 case_performance_factor = "BestCase"  #oder AverageCase oder WorstCase 
-start_year_simulatuion = 2024 # start year of simulation
+start_year_simulation = 2024 # start year of simulation
 end_year_simulation = 2030 # end year of simulation
 base_year_generation = 2023 #Basisjahr für den Verlauf von Wasserkraft, Sonstige Erneuerbare und Biomasse
 case_Temperature = "BestCase" #oder AverageCase oder WorstCase

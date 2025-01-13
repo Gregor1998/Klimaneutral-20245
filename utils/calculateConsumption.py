@@ -3,12 +3,13 @@ from utils.read_CSV import getData
 from utils.combineDataFrames import combineDataFrames
 from utils.extraploation_class import Extrapolation, Extrapolation_Consumption
 from utils.addTimeInformation import addTimeInformation
-from szenarioDefinition.szenario import*
+#from szenarioDefinition.szenario import*
+from utils import config
 
 def calculateConsumption(consumption_development_per_year): 
-    directory_yearly_consumption = getData("Consumption", consumption_year)
+    directory_yearly_consumption = getData("Consumption", config.params.consumption_year)
 
-    for year in range(start_year_simulatuion,end_year_simulation + 1):
+    for year in range(config.params.start_year_simulation, config.params.end_year_simulation + 1):
         prev_year_df =directory_yearly_consumption.get(year-1).copy()    #Kopie des Dataframe des letzten Jahres
         extrapolated_data = Extrapolation(prev_year_df, year, None, None, None, consumption_development_per_year.get(year-1))        #Erstellung eines neuen Objekts, mit einem DataFrame
         directory_yearly_consumption[extrapolated_data.year]= extrapolated_data.df   #DataFrame in das Erzeugungsverzeichnis gespeichert wird
@@ -24,6 +25,7 @@ def getConsumptionYear(year, data_df):
 
 
 def calculateConsumption_lastprofile(consumption_development_per_year, lastprofile_dict, directory_heatpump_consumption): 
+    consumption_year =  config.params.consumption_year
     directory_yearly_consumption = getData("Consumption", consumption_year) #Baisjahr für den Verbrauch
     addTimeInformation(directory_yearly_consumption[consumption_year])
     base_heatpump_lp = directory_heatpump_consumption.get(consumption_year + 1)
@@ -65,7 +67,7 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
         row['Gesamtverbrauch'] -= ((lp_eautos_sum/1000) + base_heatpump_lp.loc[idx, 'Verbrauch in MWh'])
 
 
-    for year in range(start_year_simulatuion,end_year_simulation + 1):
+    for year in range(config.params.start_year_simulation, config.params.end_year_simulation + 1):
         prev_year_df = directory_yearly_consumption.get(year-1).copy()    #Kopie des Dataframe des letzten Jahres
         lastprofil_waermepumpe_year = directory_heatpump_consumption.get(year) #Lastprofil für Wärmepumpe
         lastprofil_eAuto_year = lastprofile_dict[year] #Lastprofil für eAuto

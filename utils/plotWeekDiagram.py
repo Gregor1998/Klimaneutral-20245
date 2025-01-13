@@ -5,7 +5,8 @@ from matplotlib.dates import DayLocator, DateFormatter
 from utils.addTimeInformation import addTimeInformation
 from utils.calcDifference_storage_flexpowerplant import differenceBetweenDataframes, StorageIntegration
 from utils.cleanse_dataframes import cleanse_dataframes
-from szenarioDefinition.szenario import*
+#from szenarioDefinition.szenario import*
+from utils import config
 
 def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, directory_yearly_generation, fileName=None):
     yearly_consumption = pd.DataFrame.from_dict(consumption_extrapolation.get(int(selectedYear)))
@@ -54,7 +55,7 @@ def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, dire
 
     print(type(resdidual_df)) 
     print("residual", resdidual_df)
-    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df , _, _= StorageIntegration(production_df, resdidual_df, max_power_storage, max_storage_capicity, max_power_flexipowerplant)
+    storage_df, flexipowerplant_df,storage_ee_combined_df, all_combined_df , _, _= StorageIntegration(production_df, resdidual_df, config.params.max_power_storage, config.params.max_storage_capicity, config.params.max_power_flexipowerplant)
 
 
     addTimeInformation(storage_df)
