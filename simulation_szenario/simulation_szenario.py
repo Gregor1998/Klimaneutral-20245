@@ -5,20 +5,16 @@ import os
 from pathlib import Path
 import sys
 
+# Disable the debugger warning
+os.environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
 
-def clear_existing_images(sheet, image_filenames):
-    """Remove existing images from the Excel sheet based on the provided filenames."""
-    for picture in sheet.pictures:
-        if any(filename in picture.name for filename in image_filenames):
-            picture.delete()
 
-    
 def read_sheet_parameters(sheet):
     """
     Read simulation parameters and consumption development per year from the active Excel sheet.
     """
     # Read the table into a DataFrame
-    df = sheet.range('A1').options(pd.DataFrame, header=1, expand='table').value
+    df = sheet.range('B1').options(pd.DataFrame, header=1, expand='table').value
 
     # Strip whitespace from column names
     df.columns = df.columns.str.strip()
@@ -71,8 +67,40 @@ def read_sheet_parameters(sheet):
 
     return params
 
-# Disable the debugger warning
-os.environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
+
+
+def write_results_to_excel(base_dir, sheet_name, images):
+    wb = xw.Book.caller()
+    active_sheet_name = sheet_name
+    result_sheet_name = f"{active_sheet_name} - Result"
+
+    # Delete the result sheet if it exists
+    if result_sheet_name in [sheet.name for sheet in wb.sheets]:
+        wb.sheets[result_sheet_name].delete()
+
+    # Create a new result sheet
+    result_sheet = wb.sheets.add(result_sheet_name)
+
+    # Write images to the result sheet
+    for img_path, cell in images:
+        image_path = os.path.join(base_dir, img_path)
+        if os.path.exists(image_path):
+            result_sheet.pictures.add(image_path, top=result_sheet[cell].top, left=result_sheet[cell].left, width=500, height=273)
+
+    # Write DataFrames to the result sheet
+    df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption.csv"))
+    result_sheet["A1"].value = "Verbrauch final pro 15min"
+    result_sheet.range("A2").value = df1
+
+    df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
+    result_sheet["E1"].value = "Erzeugung final pro 15min"
+    result_sheet.range("E2").value = df2
+
+    df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
+    result_sheet["I1"].value = "CAPEX-Berechnung"
+    result_sheet.range("I2").value = df3
+
+    print(f"Results written to '{result_sheet_name}'")
 
 def main(sheet_name=None):
     wb = xw.Book.caller()
@@ -81,19 +109,17 @@ def main(sheet_name=None):
     else:
         sheet = wb.sheets[sheet_name]  # Get the active sheet (the one where the button was clicked)
 
-    sheet["F1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
+    sheet["G1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
 
     images = [
-        ('assets/plots/heatmap.png', 'B16'),
-        ('assets/plots/residual_diagramm.png', 'B36'),
-        ('assets/plots/summenhistogramm.png', 'B56'),
-        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'B75'),
-        ('assets/plots/wochendiagramm_KW.png', 'B95'),
-        ('CSV/Installed/installed_capacities_projections.png', 'B115')
+        ('assets/plots/heatmap.png', 'R6'),
+        ('assets/plots/residual_diagramm.png', 'R26'),
+        ('assets/plots/summenhistogramm.png', 'R46'),
+        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'R65'),
+        ('assets/plots/wochendiagramm_KW.png', 'R85'),
+        ('CSV/Installed/installed_capacities_projections.png', 'R105')
     ]
 
-    # Clear existing images before adding new ones
-    clear_existing_images(sheet, [Path(img[0]).name for img in images])
 
     # Set the working directory to the project root
     base_dir = Path(__file__).resolve().parent.parent
@@ -116,42 +142,22 @@ def main(sheet_name=None):
     pm.execute_notebook(
         input_path=notebook_path,
         output_path=notebook_path,
-        parameters=params
+        parameters=params,
+        log_output=False  # Disable progress output
     )
 
 
     
-    # Add images to the Excel sheet
-    for img_path, cell in images:
-        image_path = os.path.join(base_dir, img_path)
-        if os.path.exists(image_path):
-            sheet.pictures.add(image_path, top=sheet[cell].top, left=sheet[cell].left, width=500, height=273)
-
-
-
-    # Write Dataframes from Simulation back to Excel
-    df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption.csv"))
-    sheet["O1"].value = "Verbrauch final pro 15min"
-    sheet.range("O2").value = df1
-
-    
-    # Write DataFrames to the active sheet
-    df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
-    sheet["K1"].value = "Erzeugung final pro 15min"
-    sheet.range("K2").value = df2
-
-     # Write Costs back to the active sheet
-    df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
-    sheet["T1"].value = "CAPEX-Berechnung"
-    sheet.range("T2").value = df3
+    write_results_to_excel(base_dir, sheet_name, images)
 
 
 
 
     # Example: Write a confirmation message back to Excel
-    sheet["F1"].value = "Simulation completed!"
+    sheet["G1"].value = "Simulation completed!"
     print("Notebook executed successfully!")
 
 if __name__ == "__main__":
     xw.Book("simulation_szenario.xlsm").set_mock_caller()
     main()
+
