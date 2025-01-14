@@ -41,11 +41,32 @@ base_year_generation = 2023 #Basisjahr für den Verlauf von Wasserkraft, Sonstig
 case_Temperature = "BestCase" #oder AverageCase oder WorstCase
 selected_week_plot = '22' # selected week for comparison of load profile + consumption and consumption
 selected_year_plot = '2030' # selected year for comparison of load profile + consumption and consumption
+max_power_storage_start_year = 7.8
 max_power_storage = 83
 max_storage_capicity = 47
-max_power_flexipowerplant = 100
-
-
+max_power_flexipowerplant = 45
+max_power_flexipowerplant_start_year = 30 
+capex_Onshore = 1300 #€/kW Bad Case = 1900 €/kW
+capex_Offshore = 2200 #€/kW Bad Case = 3400 €/kW
+capex_PV_Dach_Kleinanlagen = 1000 #€/kW Bad Case = 2500 €/kW
+capex_PV_Dach_Großanlagen = 900 #€/kW Bad Case = 1600 €/kW
+capex_PV_Freifläche = 700 #€/kW Bad Case = 900 €/kW
+capex_Agri_PV = 900 #€/kW Bad Case = 1700 €/kW
+capex_percentage_Dach_Kleinanlgage = 0.25 #Beispielwert
+capex_percentage_Dach_Großanlagen = 0.25 #Beispielwert
+capex_percentage_Freifläche = 0.25 #Beispielwert
+capex_percentage_Agri_PV = 0.25 #Beispielwert
+capex_Bat_PV_klein = 500 #€/kWh Bad Case = 1000 €/kWh
+capex_Bat_PV_groß = 450 #€/kWh Bad Case = 850 €/kWh
+capex_Bat_PV_frei = 400 #€/kWh Bad Case = 600 €/kWh
+capex_percentage_Bat_PV_klein = 0.33 #Beispielwert
+capex_percentage_Bat_PV_groß = 0.33 #Beispielwert
+capex_percentage_Bat_PV_frei = 0.33 #Beispielwert
+capex_H2_Gasturbine = 550 #€/kW Bad Case = 1200 €/kW
+capex_H2_GuD = 1100 #€/kW Bad Case = 2400 €/kW
+capex_percentage_H2_Gasturbine = 0.5 #Beispielwert
+capex_percentage_H2_GuD = 0.5 #Beispielwert
+ 
 
 # Ausgabe zur Überprüfung
 print(consumption_development_per_year)

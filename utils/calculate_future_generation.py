@@ -15,7 +15,7 @@ def calculate_future_generation(dataFrame_performance, dataFrame_generation_star
     filepath_Onshore = f'CSV/Installed/Onshore_projections.csv'
     filepath_Offshore = f'CSV/Installed/Offshore_projections.csv'
 
-    # Einlesen der CSV-Dateien
+    # Einlesen der CSV-Dateien  
     df_PV = pd.read_csv(filepath_PV)
     df_Onshore = pd.read_csv(filepath_Onshore)
     df_Offshore = pd.read_csv(filepath_Offshore)
