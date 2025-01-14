@@ -23,7 +23,7 @@ def read_sheet_parameters(sheet):
     # Strip whitespace from column names
     df.columns = df.columns.str.strip()
 
-    # If 'Variable' is already the index, we don't need to set it again
+    # Set 'Variable' as the index if not already set
     if df.index.name != 'Variable':
         df.set_index('Variable', inplace=True)
 
@@ -35,20 +35,26 @@ def read_sheet_parameters(sheet):
         if isinstance(value, float) and value.is_integer():
             params[key] = int(value)
 
-    # Handle numeric conversion for specific keys (if needed)
+    # Numeric keys that may need special handling (e.g., German formatting with commas)
     numeric_keys = [
         'onshore_development_rate', 'offshore_development_rate', 'pv_development_rate',
         'CO2_factor_Kohle', 'CO2_factor_Gas', 'share_coal', 'share_gas',
         'IST_installierte_waermepumpen', 'SOLL_installierte_waermepumpen', 'gridlost',
-        'growth_rate_pv', 'growth_rate_onshore', 'growth_rate_offshore',
-        'max_power_storage', 'max_storage_capicity', 'max_power_flexipowerplant'
+        'growth_rate_PV', 'growth_rate_Onshore', 'growth_rate_Offshore',
+        'max_power_storage', 'max_storage_capicity', 'max_power_flexipowerplant',
+        'max_power_storage_start_year', 'capex_Onshore', 'capex_Offshore',
+        'capex_PV_Dach_Kleinanlagen', 'capex_PV_Dach_Großanlagen', 'capex_PV_Freifläche', 'capex_Agri_PV',
+        'capex_percentage_Dach_Kleinanlgage', 'capex_percentage_Dach_Großanlagen', 'capex_percentage_Freifläche', 'capex_percentage_Agri_PV',
+        'capex_Bat_PV_klein', 'capex_Bat_PV_groß', 'capex_Bat_PV_frei',
+        'capex_percentage_Bat_PV_klein', 'capex_percentage_Bat_PV_groß', 'capex_percentage_Bat_PV_frei',
+        'capex_H2_Gasturbine', 'capex_H2_GuD', 'capex_percentage_H2_Gasturbine', 'capex_percentage_H2_GuD'
     ]
+
     for key in numeric_keys:
-        if key in params and isinstance(params[key], str):  # Handle string values like "1,400,000.00"
+        if key in params:
+            # Handle German-style decimal formatting (replace ',' with '.')
             try:
-                params[key] = float(params[key].replace('.', '').replace(',', '.'))
-                if params[key].is_integer():
-                    params[key] = int(params[key])
+                params[key] = float(str(params[key]).replace(',', '.'))
             except ValueError:
                 print(f"Warning: Could not convert parameter {key} to numeric value.")
 
@@ -133,6 +139,11 @@ def main(sheet_name=None):
     df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
     sheet["K1"].value = "Erzeugung final pro 15min"
     sheet.range("K2").value = df2
+
+     # Write Costs back to the active sheet
+    df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
+    sheet["T1"].value = "CAPEX-Berechnung"
+    sheet.range("T2").value = df3
 
 
 
