@@ -38,6 +38,8 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
     sunday = ["7"]  # Sonntag
     workday = ["1", "2", "3", "4", "5"]  # Montag bis Freitag
 
+    consumption_e_auto_year_df = pd.DataFrame(columns="Verbrauch in MWh")
+
     for idx, row in directory_yearly_consumption[consumption_year].iterrows():
         weekday = row['Weekday']
         lp_wohnen, lp_buro, lp_public = None, None, None
@@ -65,6 +67,10 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
         lp_eautos_sum = lp_wohnen.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_buro.loc[lastprofil_idx, 'Strombedarf (kWh)'] + lp_public.loc[lastprofil_idx, 'Strombedarf (kWh)']
         #jetzt eautos lastprofile und danach wärmepumpen vom Gesamtverbrauch abziehen
         row['Gesamtverbrauch'] -= ((lp_eautos_sum/1000) + base_heatpump_lp.loc[idx, 'Verbrauch in MWh'])
+
+        consumption_e_auto_year_df = consumption_e_auto_year_df.append(row['Gesamtverbrauch'], ignore_index=True)
+
+
 
 
     for year in range(config.params.start_year_simulation, config.params.end_year_simulation + 1):

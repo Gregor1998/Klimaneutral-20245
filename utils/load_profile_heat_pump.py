@@ -240,6 +240,7 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
             heatpump_df = north_df + east_df + south_df + west_df
             heatpump_df.rename(columns={0: "Verbrauch in MWh"}, inplace=True)
             heatpump_df = addTimePerformance(heatpump_df, year)
+            heatpump_df.to_csv(f"CSV/Lastprofile/waermepumpe/Heatpump_{year}.csv", index=False)
             directory_heatpump_comsumption[year] = heatpump_df
 
     return directory_heatpump_comsumption

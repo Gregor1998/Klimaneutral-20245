@@ -80,7 +80,7 @@ class Extrapolation_Consumption(Extrapolation):
         self.lastprofil = lastprofil_dict
         self.waermepumpe = lastprofil_waermepumpe_year
         
-        self.apply_lastprofile()
+        #self.apply_lastprofile()
         addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
 
