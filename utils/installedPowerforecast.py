@@ -8,7 +8,7 @@ from sklearn.preprocessing import PolynomialFeatures
 # Faktoren, Variablen
 
 # Füge den Pfad zu szenarioDefinition zum Python-Pfad hinzu
-path =  "./szenarioDefinition/szenario.py"
+path =  "./simulation_szenario/simulation_szenario.py"
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #from szenarioDefinition.szenario import *
 from utils import config
