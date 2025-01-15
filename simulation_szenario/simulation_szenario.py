@@ -89,16 +89,24 @@ def write_results_to_excel(base_dir, sheet_name, images):
 
     # Write DataFrames to the result sheet
     df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption.csv"))
-    result_sheet["A1"].value = "Verbrauch final pro 15min"
-    result_sheet.range("A2").value = df1
+    result_sheet["K1"].value = "Verbrauch final pro 15min"
+    result_sheet.range("K2").value = df1.columns.tolist()
+    result_sheet.range("K3").value = df1.values.tolist()
 
     df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
-    result_sheet["E1"].value = "Erzeugung final pro 15min"
-    result_sheet.range("E2").value = df2
+    result_sheet["N1"].value = "Erzeugung final pro 15min"
+    result_sheet.range("N2").value = df2.columns.tolist()
+    result_sheet.range("N3").value = df2.values.tolist()
 
-    df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
-    result_sheet["I1"].value = "CAPEX-Berechnung"
-    result_sheet.range("I2").value = df3
+    df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_residual.csv"))
+    result_sheet["AA1"].value = "Residuallast"
+    result_sheet.range("AA2").value = df3.columns.tolist()
+    result_sheet.range("AA3").value = df3.values.tolist()
+
+    df4 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
+    result_sheet["AF1"].value = "CAPEX-Berechnung"
+    result_sheet.range("AF2").value = df4.columns.tolist()
+    result_sheet.range("AF3").value = df4.values.tolist()
 
     print(f"Results written to '{result_sheet_name}'")
 
@@ -115,12 +123,12 @@ def main(sheet_name=None):
     sheet["G1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
 
     images = [
-        ('assets/plots/heatmap.png', 'R6'),
-        ('assets/plots/residual_diagramm.png', 'R26'),
-        ('assets/plots/summenhistogramm.png', 'R46'),
-        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'R65'),
-        ('assets/plots/wochendiagramm_KW.png', 'R85'),
-        ('CSV/Installed/installed_capacities_projections.png', 'R105')
+        ('assets/plots/heatmap.png', 'A6'),
+        ('assets/plots/residual_diagramm.png', 'A26'),
+        ('assets/plots/summenhistogramm.png', 'A46'),
+        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'A65'),
+        ('assets/plots/wochendiagramm_KW.png', 'A85'),
+        ('CSV/Installed/installed_capacities_projections.png', 'A105')
     ]
 
 
