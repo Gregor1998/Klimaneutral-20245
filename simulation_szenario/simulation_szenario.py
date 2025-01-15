@@ -89,22 +89,22 @@ def write_results_to_excel(base_dir, sheet_name, images):
 
     # Write DataFrames to the result sheet
     df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption.csv"))
-    result_sheet["K1"].value = "Verbrauch final pro 15min"
+    result_sheet["K1"].value = "Verbrauch final pro 15min (MWh)"
     result_sheet.range("K2").value = df1.columns.tolist()
     result_sheet.range("K3").value = df1.values.tolist()
 
     df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
-    result_sheet["N1"].value = "Erzeugung final pro 15min"
+    result_sheet["N1"].value = "Erzeugung final pro 15min (MWh)"
     result_sheet.range("N2").value = df2.columns.tolist()
     result_sheet.range("N3").value = df2.values.tolist()
 
     df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_residual.csv"))
-    result_sheet["AA1"].value = "Residuallast"
+    result_sheet["AA1"].value = "Residuallast (MWh)"
     result_sheet.range("AA2").value = df3.columns.tolist()
     result_sheet.range("AA3").value = df3.values.tolist()
 
     df4 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
-    result_sheet["AF1"].value = "CAPEX-Berechnung"
+    result_sheet["AF1"].value = "CAPEX-Berechnung €"
     result_sheet.range("AF2").value = df4.columns.tolist()
     result_sheet.range("AF3").value = df4.values.tolist()
 
@@ -123,12 +123,13 @@ def main(sheet_name=None):
     sheet["G1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
 
     images = [
-        ('assets/plots/heatmap.png', 'A6'),
-        ('assets/plots/residual_diagramm.png', 'A26'),
-        ('assets/plots/summenhistogramm.png', 'A46'),
-        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'A65'),
-        ('assets/plots/wochendiagramm_KW.png', 'A85'),
-        ('CSV/Installed/installed_capacities_projections.png', 'A105')
+        ('assets/plots/heatmap_1_Differenz in MWh.png', 'A6'),
+        ('assets/plots/heatmap_1_Überschüssige bzw. Restbedarf Energie.png', 'A26'),
+        ('assets/plots/residual_diagramm.png', 'A46'),
+        ('assets/plots/summenhistogramm.png', 'A65'),
+        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'A85'),
+        ('assets/plots/wochendiagramm_KW.png', 'A105'),
+        ('CSV/Installed/installed_capacities_projections.png', 'A135')
     ]
 
 
