@@ -72,7 +72,7 @@ def read_sheet_parameters(sheet):
 def write_results_to_excel(base_dir, sheet_name, images):
     wb = xw.Book.caller()
     active_sheet_name = sheet_name
-    result_sheet_name = f"{active_sheet_name} - Result"
+    result_sheet_name = f"{active_sheet_name}_result"
 
     # Delete the result sheet if it exists
     if result_sheet_name in [sheet.name for sheet in wb.sheets]:
@@ -106,6 +106,7 @@ def main(sheet_name=None):
     wb = xw.Book.caller()
     if not sheet_name:
         sheet = wb.sheets.active  # Default to the active sheet if no sheet name is provided
+        sheet_name = sheet.name
     else:
         sheet = wb.sheets[sheet_name]  # Get the active sheet (the one where the button was clicked)
 
