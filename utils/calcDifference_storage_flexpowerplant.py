@@ -11,14 +11,12 @@ def differenceBetweenDataframes(df1, df2):
         difference_df['Year Month'] = difference_df['Datum'].dt.strftime('%Y %m')
         difference_df['Day'] = difference_df['Datum'].dt.strftime('%d')
 
-        # Find the longest period of negative and positive differences
-        longest_negative_df, longest_positive_df, sums_df, flex_demand = calculateLongestPeriods(difference_df)
-
-        return difference_df, longest_negative_df, longest_positive_df, sums_df
+        
+        return difference_df
     else:
         return None
 
-def calculateLongestPeriods(difference_df):
+def calculateLongestPeriods(difference_df, Case=None):
     # Überprüfen, ob die Spalte 'Differenz in MWh' existiert, andernfalls 'Restenergiebedarf in MWh' verwenden
     if 'Differenz in MWh' in difference_df.columns:
         energy_column = 'Differenz in MWh'
@@ -44,8 +42,24 @@ def calculateLongestPeriods(difference_df):
     sum_longest_negative = longest_negative_df[energy_column].sum()
     sum_longest_positive = longest_positive_df[energy_column].sum()
 
+    if Case == "residual":
+        energy_demand = sum_longest_positive
+    else:
+        energy_demand = abs(sum_longest_negative)
+        energy_power = abs(difference_df[energy_column].max() / 0.25)
+
     # Calculate flex demand
-    flex_demand = sum_longest_negative + sum_longest_positive
+    if sum_longest_negative + sum_longest_positive <= 0:
+        further_demand = 0
+    else:
+        further_demand = sum_longest_negative + sum_longest_positive
+        # Count the number of rows in longest_negative_df and longest_positive_df
+        t_negativ = len(longest_negative_df)
+        t_positiv = len(longest_positive_df)
+        negativ_power = sum_longest_negative / (t_negativ/60)
+        positiv_power = sum_longest_positive / (t_positiv/60)
+        further_demand_power = negativ_power + positiv_power
+
 
     # Save the sums to a CSV file
     sums_df = pd.DataFrame({
@@ -55,10 +69,10 @@ def calculateLongestPeriods(difference_df):
 
     sums_df.to_csv('./CSV/Storage_co/sums_longest_periods.csv', index=False)
 
-    return longest_negative_df, longest_positive_df, sums_df, flex_demand
+    return energy_demand, energy_power, further_demand, further_demand_power
     
 
-def StorageIntegration(generation_df, difference_df, storage_max_power, storage_capacity, flexipowerplant_power):
+def StorageIntegration(Case, consumption_df, generation_df, difference_df, storage_max_power, storage_capacity, flexipowerplant_power):
     """
     Integrates storage based on the difference dataframe, storage capacity, and threshold.
     Parameters:
@@ -72,8 +86,8 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     
     storage = 0
     flexipowerplant = 0
-    battery_capacity = storage_capacity * 10**3  # in MWh
-    storage_max_power = storage_max_power * 10**3  # in MW
+    battery_capacity = storage_capacity #* 10**3  # in MWh
+    storage_max_power = storage_max_power #* 10**3  # in MW
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
     
@@ -149,28 +163,36 @@ def StorageIntegration(generation_df, difference_df, storage_max_power, storage_
     all_combined_df['Flexipowerplant Einspeisung in MWh'] = flexipowerplant_df['Einspeisung in MWh']
     all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] - all_combined_df['Laden/Einspeisen in MWh'] - all_combined_df['Flexipowerplant Einspeisung in MWh']
 
-    storage_df.to_csv('./CSV/Storage_co/storage.csv')
-    flexipowerplant_df.to_csv('./CSV/Storage_co/flexipowerplant.csv')
-    storage_ee_combined_df.to_csv('./CSV/Storage_co/storage_ee_combined.csv')
-    all_combined_df.to_csv('./CSV/Storage_co/all_combined.csv')
-
     # Calculate the new difference after storage and flexible power plant integration
     new_difference_df = pd.DataFrame()
     new_difference_df['Datum'] = all_combined_df['Datum']
-    new_difference_df['Restenergiebedarf in MWh'] = difference_df['Differenz in MWh'] - all_combined_df['EE + Speicher + Flexible in MWh']
-
-    # Calculate the new difference after storage integration only
-    new_difference_storage_only_df = pd.DataFrame()
-    new_difference_storage_only_df['Datum'] = storage_ee_combined_df['Datum']
-    new_difference_storage_only_df['Restenergiebedarf in MWh'] = difference_df['Differenz in MWh'] - storage_ee_combined_df['Speicher + Erneuerbare in MWh']
-
+    new_difference_df['Restenergiebedarf in MWh'] = difference_df['Differenz in MWh'] - storage_df['Laden/Einspeisen in MWh'] + flexipowerplant_df['Einspeisung in MWh']
+   
     # Save the new dataframes to CSV
-    new_difference_df.to_csv('./CSV/Storage_co/new_difference.csv', index=False)
-    new_difference_storage_only_df.to_csv('./CSV/Storage_co/new_difference_storage_only.csv', index=False)
+    new_difference_df.to_csv(f'./CSV/Storage_co/{Case}_difference.csv', index=False)
 
-    further_storage_demand_1_df, max_demand_2_df, sums_1_df, further_flex_demand_1 = calculateLongestPeriods(new_difference_df)
-    further_storage_demand_2_df, max_demand_2_df, sums_2_df, further_flex_demand_2 = calculateLongestPeriods(new_difference_storage_only_df)
+    # Calculate the sum of all positive values in the 'Restenergiebedarf in MWh' column
+    positive_sum = new_difference_df[new_difference_df['Restenergiebedarf in MWh'] > 0]['Restenergiebedarf in MWh'].sum()
 
-    return storage_df, flexipowerplant_df, storage_ee_combined_df, all_combined_df, new_difference_df, new_difference_storage_only_df
+    # Find the maximum value in the 'Restenergiebedarf in MWh' column
+    max_value = new_difference_df['Restenergiebedarf in MWh'].max() / 0.25
+
+    if Case == "calculation just storage":
+        flex_power_demand = max_value / 0.25
+        storage_df.to_csv(f'./CSV/Storage_co/{Case}_storage.csv')
+        storage_ee_combined_df.to_csv(f'./CSV/Storage_co/{Case}_storage_ee_combined.csv')
+        return storage_df, storage_ee_combined_df, new_difference_df, flex_power_demand
+    elif Case == "calculation Storage + flexipowerplant":
+        storage_df.to_csv(f'./CSV/Storage_co/{Case}_storage.csv')
+        flexipowerplant_df.to_csv(f'./CSV/Storage_co/{Case}_flexipowerplant.csv')
+        storage_ee_combined_df.to_csv(f'./CSV/Storage_co/{Case}_storage_ee_combined.csv')
+        all_combined_df.to_csv(f'./CSV/Storage_co/{Case}_all_combined.csv')
+        return flexipowerplant_df, all_combined_df, new_difference_df
+    else:
+        storage_df.to_csv(f'./CSV/Storage_co/{Case}_storage.csv')
+        flexipowerplant_df.to_csv(f'./CSV/Storage_co/{Case}_flexipowerplant.csv')
+        storage_ee_combined_df.to_csv(f'./CSV/Storage_co/{Case}_storage_ee_combined.csv')
+        all_combined_df.to_csv(f'./CSV/Storage_co/{Case}_all_combined.csv')
+        return storage_df, flexipowerplant_df, storage_ee_combined_df, all_combined_df, new_difference_df, max_value, positive_sum
     
    
