@@ -35,7 +35,7 @@ def read_sheet_parameters(sheet):
     numeric_keys = [
         'onshore_development_rate', 'offshore_development_rate', 'pv_development_rate',
         'CO2_factor_Kohle', 'CO2_factor_Gas', 'share_coal', 'share_gas',
-        'IST_installierte_waermepumpen', 'SOLL_installierte_waermepumpen', 'gridlost',
+        'IST_installierte_waermepumpen', 'SOLL_installierte_waermepumpen', 'eAutoskWh', 'eAutosNow', 'eAutosIncrease', 'chargin_distribution_public', 'chargin_distribution_office', 'chargin_distribution_home', 'gridlost',
         'growth_rate_PV', 'growth_rate_Onshore', 'growth_rate_Offshore',
         'max_power_storage', 'max_storage_capicity', 'max_power_flexipowerplant',
         'max_power_storage_start_year', 'capex_Onshore', 'capex_Offshore',
@@ -108,6 +108,8 @@ def main(sheet_name=None):
         sheet = wb.sheets.active  # Default to the active sheet if no sheet name is provided
     else:
         sheet = wb.sheets[sheet_name]  # Get the active sheet (the one where the button was clicked)
+
+    print(sheet)
 
     sheet["G1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
 
