@@ -53,12 +53,16 @@ def project_trends(data, category, start_year, end_year, degree=2):
     projections[category] = pd.DataFrame({'year': future_years.flatten(), 'predicted_capacity': predictions})
     return projections
 
-def project_growth_scenario(start_value, growth_rate, start_year, end_year):
+def project_growth_scenario(category, start_value, growth_rate, start_year, end_year):
     years = np.arange(start_year, end_year + 1)
     values = [start_value]
     for i in range(1, len(years)):
-        new_value = values[-1] * (1 + growth_rate / 100)
-        values.append(new_value)
+        if category == 'PV':
+            new_value = values[-1] + growth_rate
+            values.append(new_value)
+        else:
+            new_value = values[-1] * growth_rate
+            values.append(new_value)
     return pd.DataFrame({'year': years, 'projected_capacity': values})
 
 # Generate projections
@@ -74,9 +78,9 @@ start_values = {
     'Onshore': installed_df.loc[installed_df['Jahr'].dt.year == 2023, 'Onshore'].values[0],
     'Offshore': installed_df.loc[installed_df['Jahr'].dt.year == 2023, 'Offshore'].values[0]}
 
-projections_pv = project_trends(installed_df, 'PV', regression_pv_start, end_year, degree=2)
-projections_on = project_trends(installed_df, 'Onshore', regression_on_start, end_year, degree=2)
-projections_off = project_trends(installed_df, 'Offshore', regression_off_start, end_year, degree=2)
+regression_pv = project_trends(installed_df, 'PV', regression_pv_start, end_year, degree=2)
+regression_on = project_trends(installed_df, 'Onshore', regression_on_start, end_year, degree=2)
+regression_off = project_trends(installed_df, 'Offshore', regression_off_start, end_year, degree=2)
 
 if not os.path.exists('./CSV/Installed/'):
     os.makedirs('./CSV/Installed/')
@@ -84,10 +88,10 @@ if not os.path.exists('./CSV/Installed/'):
 # Ensure the directory exists
 output_dir = './CSV/Installed/'
 
-# Save projections to CSV
-projections_pv['PV'].to_csv(f'{output_dir}PV_projections.csv', index=False)
-projections_on['Onshore'].to_csv(f'{output_dir}Onshore_projections.csv', index=False)
-projections_off['Offshore'].to_csv(f'{output_dir}Wind_Offshore_projections.csv', index=False)
+# Save regression to CSV
+regression_pv['PV'].to_csv(f'{output_dir}PV_regression.csv', index=False)
+regression_on['Onshore'].to_csv(f'{output_dir}Onshore_regression.csv', index=False)
+regression_off['Offshore'].to_csv(f'{output_dir}Wind_Offshore_regression.csv', index=False)
 
 
 # Generate and save projections
@@ -97,7 +101,7 @@ all_projections = {}
 for category in ['PV', 'Onshore', 'Offshore']:
     all_projections[category] = {}
     growth_rate = getattr(config.params, f"growth_rate_{category}")  # Use the growth rate from szenarien.py for each category
-    projections = project_growth_scenario(start_values[category], growth_rate, start_year_growths_rates, end_year)
+    projections = project_growth_scenario(category, start_values[category], growth_rate, start_year_growths_rates, end_year)
     
     filename = f'{output_dir}{category}_projections.csv'
     
@@ -105,17 +109,12 @@ for category in ['PV', 'Onshore', 'Offshore']:
     all_projections[category] = projections
 
 
-# Save projections to CSV
-projections_pv['PV'].to_csv(f'{output_dir}PV_projections.csv', index=False)
-projections_on['Onshore'].to_csv(f'{output_dir}Onshore_projections.csv', index=False)
-projections_off['Offshore'].to_csv(f'{output_dir}Wind_Offshore_projections.csv', index=False)
-
 # Plot projections and save to file
 plt.figure(figsize=(12, 8))
 
 # Plot PV projections
 plt.subplot(3, 1, 1)
-plt.plot(projections_pv['PV']['year'], projections_pv['PV']['predicted_capacity'], label='Regression')
+plt.plot(regression_pv['PV']['year'], regression_pv['PV']['predicted_capacity'], label='Regression')
 plt.plot(all_projections['PV']['year'], all_projections['PV']['projected_capacity'], label=f'PV {config.params.PV_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
@@ -125,7 +124,7 @@ plt.grid(True)
 
 # Plot Wind Onshore projections
 plt.subplot(3, 1, 2)
-plt.plot(projections_on['Onshore']['year'], projections_on['Onshore']['predicted_capacity'], label='Regression')
+plt.plot(regression_on['Onshore']['year'], regression_on['Onshore']['predicted_capacity'], label='Regression')
 plt.plot(all_projections['Onshore']['year'], all_projections['Onshore']['projected_capacity'], label=f'Wind Onshore {config.params.Onshore_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')
@@ -135,7 +134,7 @@ plt.grid(True)
 
 # Plot Wind Offshore projections
 plt.subplot(3, 1, 3)
-plt.plot(projections_off['Offshore']['year'], projections_off['Offshore']['predicted_capacity'], label='Regression')
+plt.plot(regression_off['Offshore']['year'], regression_off['Offshore']['predicted_capacity'], label='Regression')
 plt.plot(all_projections['Offshore']['year'], all_projections['Offshore']['projected_capacity'], label=f'Wind Offshore {config.params.Offshore_scenario}')
 plt.xlabel('Year')
 plt.ylabel('Installed Capacity (MW)')

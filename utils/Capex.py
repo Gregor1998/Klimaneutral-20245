@@ -16,8 +16,8 @@ def capex():
   df_Offshore = pd.read_csv(filepath_Offshore)
     
 
-  PV_growth = (df_PV.loc[df_PV['year'] == config.params.end_year_simulation, 'predicted_capacity'].values[0]-df_PV.loc[df_PV['year'] == config.params.start_year_simulation - 1, 'predicted_capacity'].values[0]) * 1000 #Umrechnung in kW
-  Onshore_growth = (df_Onshore.loc[df_Onshore['year'] == config.params.end_year_simulation, 'predicted_capacity'].values[0]-df_Onshore.loc[df_Onshore['year'] == config.params.start_year_simulation - 1, 'predicted_capacity'].values[0]) * 1000 #Umrechnung in kW
+  PV_growth = (df_PV.loc[df_PV['year'] == config.params.end_year_simulation, 'projected_capacity'].values[0]-df_PV.loc[df_PV['year'] == config.params.start_year_simulation - 1, 'projected_capacity'].values[0]) * 1000 #Umrechnung in kW
+  Onshore_growth = (df_Onshore.loc[df_Onshore['year'] == config.params.end_year_simulation, 'projected_capacity'].values[0]-df_Onshore.loc[df_Onshore['year'] == config.params.start_year_simulation - 1, 'projected_capacity'].values[0]) * 1000 #Umrechnung in kW
   Offshore_growth = (df_Offshore.loc[df_Offshore['year'] == config.params.end_year_simulation, 'projected_capacity'].values[0]-df_Offshore.loc[df_Offshore['year'] == config.params.start_year_simulation - 1, 'projected_capacity'].values[0]) * 1000 #Umrechnung in kW
   storage_growth = (config.params.max_power_storage - config.params.max_power_storage_start_year)*1000000 #Umrechnung in kW
   flexipowerplant_growth = (config.params.max_power_flexipowerplant - config.params.max_power_flexipowerplant_start_year)* 1000000 #Umrechnung in kW

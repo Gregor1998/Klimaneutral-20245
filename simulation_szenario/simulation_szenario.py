@@ -170,6 +170,6 @@ def main(sheet_name=None):
     print("Notebook executed successfully!")
 
 if __name__ == "__main__":
-    xw.Book("simulation_szenario.xlsm").set_mock_caller()
+    xw.Book("simulation_szenario/simulation_szenario.xlsm").set_mock_caller()
     main()
 

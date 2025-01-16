@@ -161,7 +161,7 @@ def StorageIntegration(Case, consumption_df, generation_df, difference_df, stora
     all_combined_df['Produktion EE in MWh'] = generation_df['Gesamterzeugung_EE']
     all_combined_df['Laden/Einspeisen in MWh'] = storage_df['Laden/Einspeisen in MWh']
     all_combined_df['Flexipowerplant Einspeisung in MWh'] = flexipowerplant_df['Einspeisung in MWh']
-    all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] - all_combined_df['Laden/Einspeisen in MWh'] - all_combined_df['Flexipowerplant Einspeisung in MWh']
+    all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] - all_combined_df['Laden/Einspeisen in MWh'] + all_combined_df['Flexipowerplant Einspeisung in MWh']
 
     # Calculate the new difference after storage and flexible power plant integration
     new_difference_df = pd.DataFrame()
