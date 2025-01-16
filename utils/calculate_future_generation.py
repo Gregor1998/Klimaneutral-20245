@@ -4,8 +4,6 @@ from utils.addTimePerformance import addTimePerformance
 from utils import config
 
 
-print(config.params.gridlost)
-
 def calculate_future_generation(dataFrame_performance, dataFrame_generation_start_year,  gridlost, start_year, end_year):
     # Erstellung eines leeren Dictionaries für die Generation
     directoryGeneration = {}
@@ -81,7 +79,6 @@ def calculate_future_generation(dataFrame_performance, dataFrame_generation_star
             'Sonstige Erneuerbare': df_generation_start_year['Sonstige Erneuerbare']
         })
 
-        print(config.params.gridlost)
 
         # Netzverluste einbeziehen
         combined_generation *= config.params.gridlost # aus szenarioDefinition/szenario.py

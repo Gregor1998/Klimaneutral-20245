@@ -13,8 +13,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #from szenarioDefinition.szenario import *
 from utils import config
 
-print((config.params.growth_rate_PV))
-
 # Load the data
 data = pd.read_csv('./CSV/Installed/smard_installierte_leistungen.csv', delimiter=';')
 
@@ -69,8 +67,6 @@ regression_on_start =  2013
 regression_off_start = 2016
 start_year_growths_rates = 2023
 end_year = config.params.end_year_extrapolation_installed_power
-
-print("hey there", config.params.end_year_extrapolation_installed_power)
 
 # Get 2023 start values
 start_values = {

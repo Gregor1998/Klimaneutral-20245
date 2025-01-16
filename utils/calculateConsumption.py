@@ -32,42 +32,47 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
 
     # Helper function to apply lastprofile values (subtract or add)
     def apply_lastprofile(df, lastprofile, heatpump_profile, mode="subtract"):
-        saturday = ["6"]
-        sunday = ["7"]
-        workday = ["1", "2", "3", "4", "5"]
+        # Define mapping of weekdays to profiles
+        profile_mapping = {
+            "6": "saturday",
+            "7": "sunday",
+            "1": "workday",
+            "2": "workday",
+            "3": "workday",
+            "4": "workday",
+            "5": "workday"
+        }
 
-        for idx, row in df.iterrows():
-            weekday = row['Weekday']
-            lp_wohnen, lp_buro, lp_public = None, None, None
+        # Map weekdays to profile names
+        df['profile'] = df['Weekday'].map(profile_mapping)
 
-            if weekday in saturday:
-                lp_wohnen = lastprofile['Wohnen']['saturday']
-                lp_buro = lastprofile['Büro']['saturday']
-                lp_public = lastprofile['Öffentliche_Ladepunkte']['saturday']
-            elif weekday in sunday:
-                lp_wohnen = lastprofile['Wohnen']['sunday']
-                lp_buro = lastprofile['Büro']['sunday']
-                lp_public = lastprofile['Öffentliche_Ladepunkte']['sunday']
-            elif weekday in workday:
-                lp_wohnen = lastprofile['Wohnen']['workday']
-                lp_buro = lastprofile['Büro']['workday']
-                lp_public = lastprofile['Öffentliche_Ladepunkte']['workday']
-            else:
-                continue
+        # Drop rows with weekdays not in the mapping
+        df = df[df['profile'].notna()]
 
-            lastprofil_idx = idx % len(lp_wohnen)
-            lp_eautos_sum = (
-                lp_wohnen.loc[lastprofil_idx, 'Strombedarf (kWh)'] +
-                lp_buro.loc[lastprofil_idx, 'Strombedarf (kWh)'] +
-                lp_public.loc[lastprofil_idx, 'Strombedarf (kWh)']
-            )
+        # Function to compute the adjustment value for each row
+        def compute_adjustment(row):
+            profile_name = row['profile']
+            lastprofil_idx = row.name % len(lastprofile['Wohnen'][profile_name])
+            
+            lp_wohnen = lastprofile['Wohnen'][profile_name].loc[lastprofil_idx, 'Strombedarf (kWh)']
+            lp_buro = lastprofile['Büro'][profile_name].loc[lastprofil_idx, 'Strombedarf (kWh)']
+            lp_public = lastprofile['Öffentliche_Ladepunkte'][profile_name].loc[lastprofil_idx, 'Strombedarf (kWh)']
 
-            # Adjust 'Gesamtverbrauch' based on the mode
-            adjustment_value = (lp_eautos_sum / 1000) + heatpump_profile.loc[idx, 'Verbrauch in MWh']
+            lp_eautos_sum = lp_wohnen + lp_buro + lp_public
+            adjustment_value = (lp_eautos_sum / 1000) + heatpump_profile.loc[row.name, 'Verbrauch in MWh']
+
             if mode == "subtract":
-                df.loc[idx, 'Gesamtverbrauch'] -= adjustment_value
+                return row['Gesamtverbrauch'] - adjustment_value
             elif mode == "add":
-                df.loc[idx, 'Gesamtverbrauch'] += adjustment_value
+                return row['Gesamtverbrauch'] + adjustment_value
+            else:
+                return row['Gesamtverbrauch']  # No adjustment if mode is invalid
+
+        # Apply the adjustment computation function
+        df['Gesamtverbrauch'] = df.apply(compute_adjustment, axis=1)
+
+        # Drop the temporary profile column
+        df.drop(columns=['profile'], inplace=True)
 
         return df
 

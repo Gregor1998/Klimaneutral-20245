@@ -83,7 +83,7 @@ class Extrapolation_Consumption(Extrapolation):
         #self.apply_lastprofile()
         addTimeInformation(self.df)  # Falls benötigt, kannst du diese Zeile wieder aktivieren
 
-
+"""
     def apply_lastprofile(self):
         saturday = ["6"]  # Samstag
         sunday = ["7"]  # Sonntag
@@ -119,4 +119,4 @@ class Extrapolation_Consumption(Extrapolation):
 
 
         #self.df.drop(columns=['Weekday'], inplace=True)
-            
+    """
