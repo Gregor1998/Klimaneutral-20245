@@ -37,7 +37,7 @@ def read_sheet_parameters(sheet):
         'CO2_factor_Kohle', 'CO2_factor_Gas', 'share_coal', 'share_gas',
         'IST_installierte_waermepumpen', 'SOLL_installierte_waermepumpen', 'eAutoskWh', 'eAutosNow', 'eAutosIncrease', 'chargin_distribution_public', 'chargin_distribution_office', 'chargin_distribution_home', 'gridlost',
         'growth_rate_PV', 'growth_rate_Onshore', 'growth_rate_Offshore',
-        'max_power_storage', 'max_storage_capicity', 'max_power_flexipowerplant',
+        'max_power_storage', 'max_storage_capacity', 'max_power_flexipowerplant',
         'max_power_storage_start_year', 'capex_Onshore', 'capex_Offshore',
         'capex_PV_Dach_Kleinanlagen', 'capex_PV_Dach_Großanlagen', 'capex_PV_Freifläche', 'capex_Agri_PV',
         'capex_percentage_Dach_Kleinanlgage', 'capex_percentage_Dach_Großanlagen', 'capex_percentage_Freifläche', 'capex_percentage_Agri_PV',

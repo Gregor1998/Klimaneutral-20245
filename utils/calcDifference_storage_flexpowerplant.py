@@ -86,8 +86,8 @@ def StorageIntegration(Case, consumption_df, generation_df, difference_df, stora
     
     storage = 0
     flexipowerplant = 0
-    battery_capacity = storage_capacity #* 10**3  # in MWh
-    storage_max_power = storage_max_power #* 10**3  # in MW
+    battery_capacity = storage_capacity * 10**3  # in MWh
+    storage_max_power = storage_max_power * 10**3  # in MW
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
     
@@ -154,14 +154,14 @@ def StorageIntegration(Case, consumption_df, generation_df, difference_df, stora
     storage_ee_combined_df['Datum'] = storage_df['Datum']
     storage_ee_combined_df['Produktion EE in MWh'] = generation_df['Gesamterzeugung_EE']
     storage_ee_combined_df['Laden/Einspeisen in MWh'] = storage_df['Laden/Einspeisen in MWh']
-    storage_ee_combined_df['Speicher + Erneuerbare in MWh'] = storage_ee_combined_df['Produktion EE in MWh'] - storage_ee_combined_df['Laden/Einspeisen in MWh']
+    storage_ee_combined_df['Speicher + Erneuerbare in MWh'] = storage_ee_combined_df['Produktion EE in MWh'] + storage_ee_combined_df['Laden/Einspeisen in MWh']
 
     all_combined_df = pd.DataFrame()
     all_combined_df['Datum'] = difference_df['Datum']
     all_combined_df['Produktion EE in MWh'] = generation_df['Gesamterzeugung_EE']
     all_combined_df['Laden/Einspeisen in MWh'] = storage_df['Laden/Einspeisen in MWh']
     all_combined_df['Flexipowerplant Einspeisung in MWh'] = flexipowerplant_df['Einspeisung in MWh']
-    all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] - all_combined_df['Laden/Einspeisen in MWh'] + all_combined_df['Flexipowerplant Einspeisung in MWh']
+    all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] + all_combined_df['Laden/Einspeisen in MWh'] - all_combined_df['Flexipowerplant Einspeisung in MWh']
 
     # Calculate the new difference after storage and flexible power plant integration
     new_difference_df = pd.DataFrame()
