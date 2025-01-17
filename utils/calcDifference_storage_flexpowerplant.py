@@ -85,39 +85,26 @@ def calculateLongestPeriods(difference_df, Case=None):
     
 
 def StorageIntegration(Case, consumption_df, generation_df, difference_df, storage_max_power, storage_capacity, flexipowerplant_power):
-    """
-    Integrates storage based on the difference dataframe, storage capacity, and threshold.
-    Parameters:
-    difference_df (pd.DataFrame): DataFrame containing 'Datum' and 'Differenz' columns.
-    storage_capacity (int): Maximum storage capacity.
-    storage_max_power (int): Maximum power for charging/discharging the storage.
-    flexipowerplant_power (int): Maximum power for the flexible power plant.
-    Returns:
-    pd.DataFrame: DataFrame with 'Datum', 'Differenz', 'Speicher', and 'Netz' columns, where 'Speicher' represents the storage values and 'Netz' represents the net energy flow.
-    """
     
     storage = 0
-    flexipowerplant = 0
     battery_capacity = storage_capacity * 10**3  # in MWh
     storage_max_power = storage_max_power * 10**3  # in MW
     flexipowerplant_power = flexipowerplant_power * 10**3  # in MW
     flexipowerplant_capacity = flexipowerplant_power * (15/60)  # in MWh
-    
-    if isinstance(difference_df, tuple):
-        print("my_tuple ist ein Tupel")
 
+    storage_df = pd.DataFrame({
+        'Datum': difference_df['Datum'],
+        'Differenz in MWh': difference_df['Differenz in MWh'],
+        'Kapazität in MWh': 0.0,
+        'Laden/Einspeisen in MWh': 0.0
+    })
 
-    storage_df = pd.DataFrame()
-    storage_df['Datum'] = difference_df['Datum']
-    storage_df['Differenz in MWh'] = difference_df['Differenz in MWh']
-    storage_df['Kapazität in MWh'] = 0.0
-    storage_df['Laden/Einspeisen in MWh'] = 0.0
-
-    flexipowerplant_df = pd.DataFrame()
-    flexipowerplant_df['Datum'] = difference_df['Datum']
-    flexipowerplant_df['Kapazität in MWh'] = flexipowerplant_capacity
-    flexipowerplant_df['Restkapazität in MWh'] = flexipowerplant_capacity
-    flexipowerplant_df['Einspeisung in MWh'] = 0.0
+    flexipowerplant_df = pd.DataFrame({
+        'Datum': difference_df['Datum'],
+        'Kapazität in MWh': flexipowerplant_capacity,
+        'Restkapazität in MWh': flexipowerplant_capacity,
+        'Einspeisung in MWh': 0.0
+    })
 
     for i in range(len(difference_df)):
         diff = difference_df.loc[i, 'Differenz in MWh']
@@ -162,24 +149,26 @@ def StorageIntegration(Case, consumption_df, generation_df, difference_df, stora
                     flexipowerplant_df.loc[i, 'Einspeisung in MWh'] = -flexipowerplant_capacity
                     flexipowerplant_df.loc[i, 'Restkapazität in MWh'] = 0
 
-    storage_ee_combined_df = pd.DataFrame()
-    storage_ee_combined_df['Datum'] = storage_df['Datum']
-    storage_ee_combined_df['Produktion EE in MWh'] = generation_df['Gesamterzeugung_EE']
-    storage_ee_combined_df['Laden/Einspeisen in MWh'] = storage_df['Laden/Einspeisen in MWh']
-    storage_ee_combined_df['Speicher + Erneuerbare in MWh'] = storage_ee_combined_df['Produktion EE in MWh'] + storage_ee_combined_df['Laden/Einspeisen in MWh']
+    storage_ee_combined_df = pd.DataFrame({
+        'Datum': storage_df['Datum'],
+        'Produktion EE in MWh': generation_df['Gesamterzeugung_EE'],
+        'Laden/Einspeisen in MWh': storage_df['Laden/Einspeisen in MWh'],
+        'Speicher + Erneuerbare in MWh': generation_df['Gesamterzeugung_EE'] + storage_df['Laden/Einspeisen in MWh'],
+        'Restenergiebedarf in MWh': difference_df['Differenz in MWh'] - storage_df['Laden/Einspeisen in MWh']
+    })
 
-    all_combined_df = pd.DataFrame()
-    all_combined_df['Datum'] = difference_df['Datum']
-    all_combined_df['Produktion EE in MWh'] = generation_df['Gesamterzeugung_EE']
-    all_combined_df['Laden/Einspeisen in MWh'] = storage_df['Laden/Einspeisen in MWh']
-    all_combined_df['Flexipowerplant Einspeisung in MWh'] = flexipowerplant_df['Einspeisung in MWh']
-    all_combined_df['EE + Speicher + Flexible in MWh'] = all_combined_df['Produktion EE in MWh'] + all_combined_df['Laden/Einspeisen in MWh'] - all_combined_df['Flexipowerplant Einspeisung in MWh']
+    all_combined_df = pd.DataFrame({
+        'Datum': difference_df['Datum'],
+        'Produktion EE in MWh': generation_df['Gesamterzeugung_EE'],
+        'Laden/Einspeisen in MWh': storage_df['Laden/Einspeisen in MWh'],
+        'Flexipowerplant Einspeisung in MWh': flexipowerplant_df['Einspeisung in MWh'],
+        'EE + Speicher + Flexible in MWh': generation_df['Gesamterzeugung_EE'] + storage_df['Laden/Einspeisen in MWh'] - flexipowerplant_df['Einspeisung in MWh']
+    })
 
-    # Calculate the new difference after storage and flexible power plant integration
-    new_difference_df = pd.DataFrame()
-    new_difference_df['Datum'] = all_combined_df['Datum']
-    new_difference_df['Restenergiebedarf in MWh'] = difference_df['Differenz in MWh'] - storage_df['Laden/Einspeisen in MWh'] + flexipowerplant_df['Einspeisung in MWh']
-   
+    new_difference_df = pd.DataFrame({
+        'Datum': all_combined_df['Datum'],
+        'Restenergiebedarf in MWh': difference_df['Differenz in MWh'] - storage_df['Laden/Einspeisen in MWh'] + flexipowerplant_df['Einspeisung in MWh']
+    })
     # Save the new dataframes to CSV
     new_difference_df.to_csv(f'./CSV/Storage_co/{Case}_difference.csv', index=False)
 
@@ -206,5 +195,3 @@ def StorageIntegration(Case, consumption_df, generation_df, difference_df, stora
         storage_ee_combined_df.to_csv(f'./CSV/Storage_co/{Case}_storage_ee_combined.csv')
         all_combined_df.to_csv(f'./CSV/Storage_co/{Case}_all_combined.csv')
         return storage_df, flexipowerplant_df, storage_ee_combined_df, all_combined_df, new_difference_df, max_value, positive_sum
-    
-   
