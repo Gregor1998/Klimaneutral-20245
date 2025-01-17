@@ -28,9 +28,21 @@ def calculateLongestPeriods(difference_df, Case=None):
     difference_df['Sign'] = difference_df[energy_column].apply(lambda x: 'Positive' if x > 0 else 'Negative')
     difference_df['Group'] = (difference_df['Sign'] != difference_df['Sign'].shift()).cumsum()
 
-    longest_negative_period = difference_df[difference_df['Sign'] == 'Negative'].groupby('Group').size().idxmax()
-    longest_positive_period = difference_df[difference_df['Sign'] == 'Positive'].groupby('Group').size().idxmax()
+    negative_groups = difference_df[difference_df['Sign'] == 'Negative'].groupby('Group').size()
 
+    if not negative_groups.empty:
+        longest_negative_period = negative_groups.idxmax()
+    else:
+        longest_negative_period = 0    
+
+    positive_groups = difference_df[difference_df['Sign'] == 'Positive'].groupby('Group').size()
+
+    if not positive_groups.empty:
+        longest_positive_period = positive_groups.idxmax()
+    else:
+        longest_positive_period = 0  
+        
+        
     longest_negative_df = difference_df[difference_df['Group'] == longest_negative_period]
     longest_positive_df = difference_df[difference_df['Group'] == longest_positive_period]
 
