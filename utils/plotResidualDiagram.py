@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from utils.cleanse_dataframes import cleanse_dataframes
+from matplotlib.ticker import FuncFormatter
 
 def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directory_yearly_consumption):
     # Erstelle einen leeren DataFrame, um die Ergebnisse zu speichern
@@ -38,19 +39,25 @@ def plotResidualDiagram(startYear, endYear, directory_yearly_generation, directo
         else:
             print(f"DataFrames für das Jahr {year} fehlen in einem der Verzeichnisse.")
 
-    yearly_sums = all_years_difference_df.groupby('Jahr')['Differenz'].sum()
+    yearly_sums = all_years_difference_df.groupby('Jahr')['Differenz'].sum().abs()
+
+    print(yearly_sums)
 
     # Erstelle das Liniendiagramm
     plt.figure(figsize=(10, 6))
     plt.plot(yearly_sums.index, yearly_sums.values, marker='o', linestyle='-', color='b')
 
+
+    # Verwende vollständige Zahlen auf der y-Achse
+    formatter = FuncFormatter(lambda x, _: f'{int(x):,}')  # Format with thousands separator
+    plt.gca().yaxis.set_major_formatter(formatter)
+
     # Achsenbeschriftungen und Titel hinzufügen
     plt.xlabel('Jahr')
-    plt.ylabel('Summe der Differenz')
-    plt.title('Jährliche Summe der Differenz zwischen Verbrauch und Produktion')
+    plt.ylabel('Höhe der Resiudallast, bzw. was EE nicht decken konnte, in MWh')
+    plt.title('Verlauf der Residuallast')
     plt.grid(True)
     plt.savefig('assets/plots/residual_diagramm.png')
     # Diagramm anzeigen
     plt.show()
 
-    
