@@ -44,5 +44,12 @@ def capex():
   costs_df.loc[0] = [PV_costs, Onshore_costs, Offshore_costs, Storage_costs, Flexipowerplant_costs, total_costs]
   
   return costs_df
+
+
+def capex_theoretically_storage():
+  
+  costs_df = pd.DataFrame(columns=['Speicher-Kosten [Mrd. €]'] )
+
+  df = pd.read_csv
     
 
