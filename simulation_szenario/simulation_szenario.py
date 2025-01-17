@@ -69,7 +69,7 @@ def read_sheet_parameters(sheet):
 
 
 
-def write_results_to_excel(base_dir, sheet_name, images):
+def write_results_to_excel(base_dir, sheet_name, images, params):
     wb = xw.Book.caller()
     active_sheet_name = sheet_name
     result_sheet_name = f"{active_sheet_name}_result"
@@ -99,14 +99,32 @@ def write_results_to_excel(base_dir, sheet_name, images):
     result_sheet.range("N3").value = df2.values.tolist()
 
     df3 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_residual.csv"))
-    result_sheet["AA1"].value = "Residuallast (MWh)"
+    result_sheet["AA1"].value = "Residuallast nach inklusion Flexiblen + Speicher (MWh)"
     result_sheet.range("AA2").value = df3.columns.tolist()
     result_sheet.range("AA3").value = df3.values.tolist()
 
-    df4 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
+    df4 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "further_demand.csv"))
+    result_sheet["X1"].value = "Residuallast nach inklusion Flexiblen + Speicher (MWh)"
+    result_sheet.range("X2").value = df4.values.tolist()
+
+    df5 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "further_power.csv"))
+    result_sheet.range("Y1").value = "Peak benötigte Leistung  von residual Erzeuger(MW)"
+    result_sheet.range("Y2").value = df5.values.tolist()
+
+    df6 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "total_costs.csv"))
     result_sheet["AF1"].value = "CAPEX-Berechnung €"
-    result_sheet.range("AF2").value = df4.columns.tolist()
-    result_sheet.range("AF3").value = df4.values.tolist()
+    result_sheet.range("AF2").value = df6.columns.tolist()
+    result_sheet.range("AF3").value = df6.values.tolist()
+
+    df7 = pd.read_csv(os.path.join(base_dir, 'CSV', 'Storage_co', f"{params['scenario_name']}_all_combined.csv"))
+    result_sheet["AN1"].value = "Übersicht Erzeugung + Speicher + Flexible"
+    result_sheet.range("AN2").value = df7.columns.tolist()
+    result_sheet.range("AN3").value = df7.values.tolist()
+
+    df8 = pd.read_csv(os.path.join(base_dir, "CSV", "Storage_co", f"{params['scenario_name']}_storage.csv"))
+    result_sheet["AS1"].value = "Aktueller Speicherstand"
+    result_sheet.range("AS2").value = df8.columns.tolist()
+    result_sheet.range("AS3").value = df8.values.tolist()
 
     print(f"Results written to '{result_sheet_name}'")
 
@@ -144,6 +162,7 @@ def main(sheet_name=None):
     # Read parameters from the active sheet
     params = read_sheet_parameters(sheet) #-> Simulations Parameter
     print(params)
+    print(params['scenario_name'])
 
     # Path to your Jupyter Notebook
     base_dir = Path(__file__).resolve().parent.parent
@@ -160,7 +179,7 @@ def main(sheet_name=None):
 
 
     
-    write_results_to_excel(base_dir, sheet_name, images)
+    write_results_to_excel(base_dir, sheet_name, images, params)
 
 
 
