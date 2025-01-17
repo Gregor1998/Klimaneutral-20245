@@ -13,9 +13,14 @@ def calculate_future_generation(dataFrame_performance, dataFrame_generation_star
     df_generation_start_year = dataFrame_generation_start_year.copy()
 
     # Pfade zu den CSV-Dateien, je nach Case
-    filepath_PV = f'CSV/Installed/PV_projections.csv'
-    filepath_Onshore = f'CSV/Installed/Onshore_projections.csv'
-    filepath_Offshore = f'CSV/Installed/Offshore_projections.csv'
+    if config.params.scenario_name != 'SMARD':
+        filepath_PV = f'CSV/Installed/PV_projections.csv'
+        filepath_Onshore = f'CSV/Installed/Onshore_projections.csv'
+        filepath_Offshore = f'CSV/Installed/Offshore_projections.csv'
+    else:
+        filepath_PV = f'CSV/Installed/PV_regression.csv'
+        filepath_Onshore = f'CSV/Installed/Onshore_regression.csv'
+        filepath_Offshore = f'CSV/Installed/Offshore_regression.csv'
 
     # Einlesen der CSV-Dateien
     df_PV = pd.read_csv(filepath_PV)
@@ -29,12 +34,20 @@ def calculate_future_generation(dataFrame_performance, dataFrame_generation_star
 
 
     # Zusammenführen der Daten
+    if config.params.scenario_name != 'SMARD':
+        column_name = 'projected_capacity'
+    else:
+        column_name = 'predicted_capacity'
+ 
+ 
+    # Zusammenführen der Daten
     df_combined = pd.concat([
         df_filtered_PV['year'],
-        df_filtered_PV['projected_capacity'],
-        df_filtered_Onshore['projected_capacity'],
-        df_filtered_Offshore['projected_capacity']
+        df_filtered_PV[column_name],
+        df_filtered_Onshore[column_name],
+        df_filtered_Offshore[column_name]
     ], axis=1)
+
     df_combined.columns = ['Jahr', 'Photovoltaik', 'Wind Onshore', 'Wind Offshore']
 
     # Umwandlung in ein Dictionary

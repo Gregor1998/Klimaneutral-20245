@@ -91,7 +91,7 @@ output_dir = './CSV/Installed/'
 # Save regression to CSV
 regression_pv['PV'].to_csv(f'{output_dir}PV_regression.csv', index=False)
 regression_on['Onshore'].to_csv(f'{output_dir}Onshore_regression.csv', index=False)
-regression_off['Offshore'].to_csv(f'{output_dir}Wind_Offshore_regression.csv', index=False)
+regression_off['Offshore'].to_csv(f'{output_dir}Offshore_regression.csv', index=False)
 
 
 # Generate and save projections
