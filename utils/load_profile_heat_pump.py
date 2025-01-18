@@ -52,7 +52,7 @@ def lastprofil_heatpump(installed_heatpumps, expected_heatpumps, first_year, end
     df_temperature = temperature(case_Temperature)  # DataFrame mit Temperaturwerten pro Monat
 
     # Einlesen des Lastprofils
-    df_lastprofile = getData("Heatpump")  # DataFrame mit Lastprofilen (-12 bis 18 °C, 96 Zeilen pro Tag)
+    df_lastprofile = getData("Heatpump")  # DataFrame mit Lastprofilen (-17 bis 17 °C, 96 Zeilen pro Tag)
     if len(df_lastprofile) != 96:
         raise ValueError("Lastprofil muss 96 Zeilen pro Tag enthalten.")
     
@@ -193,10 +193,10 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
 
                 #Lastprofil für die Region Nord berechnen
                 temperatureNorth = directory_temperature["North"]["Temperatur"][index]  #Temperatur für jeweilige Stunde Region Nord
-                if temperatureNorth < -12:  #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureNorth = -12
-                elif temperatureNorth > 18: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureNorth = 18
+                if temperatureNorth < -17:  #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureNorth = -17
+                elif temperatureNorth > 17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureNorth = 17
 
                 loadProfileNorth = directory_load_profile_by_hour[hour][temperatureNorth].copy() #Lastprofil für die Stunde und Temperatur
                 loadProfileHourNorth = (loadProfileNorth*(current_installed*distribution_north))/1000    #Last für die Region North in einer bestimmten Stunde in MWh
@@ -205,10 +205,10 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
 
                 #Lastprofil für die Region Ost berechnen
                 temperatureEast = directory_temperature["East"]["Temperatur"][index] #Temperatur für jeweilige Stunde Region Ost
-                if temperatureEast < -12: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureEast = -12
-                elif temperatureEast > 18: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureEast = 18
+                if temperatureEast < -17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureEast = -17
+                elif temperatureEast > 17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureEast = 17
 
                 loadProfileEast = directory_load_profile_by_hour[hour][temperatureEast].copy() #Lastprofil für die Stunde und Temperatur
                 loadProfileHourEast = (loadProfileEast*(current_installed*distribution_east))/1000   #Last für die Region East in einer bestimmten Stunde in MWh
@@ -217,10 +217,10 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
 
                 #Lastprofil für die Region Süd berechnen
                 temperatureSouth = directory_temperature["South"]["Temperatur"][index] #Temperatur für jeweilige Stunde Region Süd
-                if temperatureSouth < -12: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureSouth = -12
-                elif temperatureSouth > 18: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureSouth = 18
+                if temperatureSouth < -17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureSouth = -17
+                elif temperatureSouth > 17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureSouth = 17
                 
                 loadProfileSouth = directory_load_profile_by_hour[hour][temperatureSouth].copy() #Lastprofil für die Stunde und Temperatur
                 loadProfileHourSouth = (loadProfileSouth*(current_installed*distribution_south))/1000  #Last für die Region South in einer bestimmten Stunde in MWh
@@ -229,10 +229,10 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
 
                 #Lastprofil für die Region West berechnen
                 temperatureWest = directory_temperature["West"]["Temperatur"][index] #Temperatur für jeweilige Stunde Region West
-                if temperatureWest < -12: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureWest = -12
-                elif temperatureWest > 18: #Sicherstellen, dass die Temperatur im Lastprofil existiert
-                    temperatureWest = 18
+                if temperatureWest < -17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureWest = -17
+                elif temperatureWest > 17: #Sicherstellen, dass die Temperatur im Lastprofil existiert
+                    temperatureWest = 17
                 
                 loadProfileWest = directory_load_profile_by_hour[hour][temperatureWest].copy() #Lastprofil für die Stunde und Temperatur
                 loadProfileHourWest = (loadProfileWest*(current_installed*distribution_west))/1000 #Last für die Region West in einer bestimmten Stunde in MWh

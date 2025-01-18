@@ -98,7 +98,7 @@ def read_SMARD_data(path, mode):
 
     elif(mode == "Heatpump"):
         #Herauslöschen der Spalten, die nicht benötigt werden
-        df.drop(columns = ["øC"], inplace = True)
+        #df.drop(columns = ["øC"], inplace = True)
 
         df['Stunde'] = df['Tageszeit'].str[:2].astype(int)  # Erstelle eine neue Spalte mit der Stunde
 
@@ -193,7 +193,7 @@ def getData(mode, year_cons=None, start_year_ee=None, end_year_ee=None, optional
     
     elif mode == "Heatpump":
         path_var = "CSV/Lastprofile/waermepumpe/"
-        file_path = os.path.join(path_var, "S_energis_Lastprofil_W0.csv")
+        file_path = os.path.join(path_var, "lp_WP_neu.csv")
         if os.path.exists(file_path):
             dataFrames = read_SMARD_data(file_path, "Heatpump")
         else: 
