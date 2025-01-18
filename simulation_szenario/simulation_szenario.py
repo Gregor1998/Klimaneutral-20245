@@ -136,6 +136,10 @@ def write_results_to_excel(base_dir, sheet_name, images, params):
     result_sheet.range("BC2").value = df10.columns.tolist()
     result_sheet.range("BC3").value = df10.values.tolist()
 
+    df11 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "storage_values.csv"))
+    result_sheet["BJ1"].value = "Speicherwerte"
+    result_sheet.range("BJ2").value = df11.columns.tolist()
+    result_sheet.range("BJ3").value = df11.values.tolist()
     print(f"Results written to '{result_sheet_name}'")
 
 def main(sheet_name=None):
