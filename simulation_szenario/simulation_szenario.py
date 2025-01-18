@@ -150,16 +150,6 @@ def main(sheet_name=None):
 
     sheet["G1"].value = "Simulation in progress..."  # Write a message to the Excel sheet
 
-    images = [
-        ('assets/plots/heatmap_1_Differenz in MWh.png', 'A6'),
-        ('assets/plots/heatmap_1_Überschüssige bzw. Restbedarf Energie.png', 'A26'),
-        ('assets/plots/residual_diagramm.png', 'A46'),
-        ('assets/plots/summenhistogramm.png', 'A65'),
-        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'A85'),
-        ('assets/plots/wochendiagramm_KW.png', 'A105'),
-        ('CSV/Installed/installed_capacities_projections.png', 'A135')
-    ]
-
 
     # Set the working directory to the project root
     base_dir = Path(__file__).resolve().parent.parent
@@ -188,6 +178,19 @@ def main(sheet_name=None):
     )
 
 
+    images = [
+        ('assets/plots/heatmap_1_Differenz von EE und Verbrauch in MWh.png', 'A6'),
+        ('assets/plots/heatmap_1_Überschüssige bzw. Restbedarf Energie nach maximal möglicher Nutzung von Speicher.png', 'A26'),
+        ('assets/plots/heatmap_2_Überschüssige bzw. Restbedarf Energie nach zusätzlich optimalen Ausbau von Flexiblen.png', 'A46'),
+        (f'assets/plots/heatmap_3_Überschüssige bzw. Restbedarf Energie mit Speicher ({params['scenario_name']}).png', 'A66'),
+        (f'assets/plots/heatmap_4_Überschüssige bzw. Restbedarf Energie mit Speicher und Flexiblen ({params['scenario_name']}).png', 'A86'),
+        ('assets/plots/wochendiagramm_KW.png', 'A106'),
+        ('assets/plots/summenhistogramm.png', 'A126'),
+        ('assets/plots/summenhistogramm_all.png', 'A146'),
+        ('assets/plots/summenhistogramm_ee_storage.png', 'A166'),
+        ('assets/plots/vergleich_verbrauch_lastprofile.png', 'A196'),
+        ('CSV/Installed/installed_capacities_projections.png', 'A216'),
+    ]
     
     write_results_to_excel(base_dir, sheet_name, images, params)
 
