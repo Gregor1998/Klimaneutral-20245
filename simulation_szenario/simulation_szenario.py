@@ -89,9 +89,15 @@ def write_results_to_excel(base_dir, sheet_name, images, params):
 
     # Write DataFrames to the result sheet
     df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption.csv"))
-    result_sheet["K1"].value = "Verbrauch final pro 15min (MWh)"
-    result_sheet.range("K2").value = df1.columns.tolist()
-    result_sheet.range("K3").value = df1.values.tolist()
+    result_sheet["J1"].value = "Verbrauch final pro 15min (MWh)"
+    result_sheet.range("J2").value = df1.columns.tolist()
+    result_sheet.range("J3").value = df1.values.tolist()
+
+     # Write DataFrames to the result sheet
+    df1 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_consumption_ohne_lp.csv"))
+    result_sheet["L1"].value = "Verbrauch ohne LP"
+    result_sheet.range("L2").value = df1.columns.tolist()
+    result_sheet.range("L3").value = df1.values.tolist()
 
     df2 = pd.read_csv(os.path.join(base_dir, "CSV", "Results", "final_production.csv"))
     result_sheet["N1"].value = "Erzeugung final pro 15min (MWh)"

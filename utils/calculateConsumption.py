@@ -84,13 +84,29 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
         mode="subtract"
     )
 
+    directory_yearly_consumption[consumption_year].to_csv("CSV/testing/consumption_2023.csv")
+
+
+
     # **Step 2: Extrapolate for all years**
     for year in range(config.params.start_year_simulation, config.params.end_year_simulation + 1):
         prev_year_df = directory_yearly_consumption.get(year - 1).copy()
+
+        print("PREV", prev_year_df)
+        print("FAKTOR", consumption_development_per_year.get(year - 1))
+
+        
+
         extrapolated_data = Extrapolation_Consumption(
-            prev_year_df, year, None, None, None, consumption_development_per_year.get(year - 1)
+            prev_year_df, year, None, None, None, consumption_development_per_year.get(year)
         )
+
+        
         directory_yearly_consumption[extrapolated_data.year] = extrapolated_data.df
+
+        print("UPDATE", directory_yearly_consumption[extrapolated_data.year])
+        directory_yearly_consumption[extrapolated_data.year].to_csv(f"CSV/testing/consumption_after_hochrechnung_{year}.csv")
+
 
     # **Step 3: Add back lastprofile to each year after extrapolation**
     for year in range(config.params.start_year_simulation, config.params.end_year_simulation + 1):
@@ -100,5 +116,6 @@ def calculateConsumption_lastprofile(consumption_development_per_year, lastprofi
             directory_heatpump_consumption.get(year, base_heatpump_lp),
             mode="add"
         )
+        directory_yearly_consumption[year].to_csv(f"CSV/testing/consumption_final_mit_lp_{year}.csv")
 
     return directory_yearly_consumption
