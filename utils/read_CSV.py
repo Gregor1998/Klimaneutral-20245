@@ -97,20 +97,15 @@ def read_SMARD_data(path, mode):
         df.drop(columns = ["Sonstige Konventionelle"], inplace = True)
 
     elif(mode == "Heatpump"):
-        #Herauslöschen der Spalten, die nicht benötigt werden
-        #df.drop(columns = ["øC"], inplace = True)
+         #Formatierung der Datumstpalte
+            df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
 
-        df['Stunde'] = df['Tageszeit'].str[:2].astype(int)  # Erstelle eine neue Spalte mit der Stunde
+            #Herauslöschen der Zeilen des 29. Feburars
+            #Werte des 29.Februar entfernen, falls vorhanden
+            df = df[~((df['Datum'].dt.month == 2) & (df['Datum'].dt.day == 29))].sort_values(by="Datum")
+            df.reset_index(drop=True, inplace=True)
 
-        # Erstelle ein Dictionary mit dem Stundenwert als Schlüssel und dem zugehörigen DataFrame als Wert
-        directory_load_profile_by_hour = {hour: df for hour, df in df.groupby('Stunde')}
-
-        
-        for hour in directory_load_profile_by_hour:
-            # Lösche die Spalten 'Tageszeit' und 'Stunde' aus jedem DataFrame im Dictionary
-            directory_load_profile_by_hour[hour] = directory_load_profile_by_hour[hour].drop(columns=["Tageszeit", "Stunde"]).reset_index(drop=True) 
-
-            directory_load_profile_by_hour[hour].columns = directory_load_profile_by_hour[hour].columns.map(int) # Spaltennamen in Integer umwandeln
+            df.drop(columns = ["Datum"], inplace = True)
 
     
     elif mode == "Temperature":
@@ -139,11 +134,13 @@ def read_SMARD_data(path, mode):
     #Formatierung der Datumstpalte
     if mode not in ["Installed", "Heatpump", "Temperature","Population"]:
         df['Datum'] = pd.to_datetime(df['Datum'], format= '%d.%m.%Y %H:%M')
-        
+
+    """  
     if mode == "Heatpump":
         returnvalue = directory_load_profile_by_hour
     else:
-        returnvalue = df
+    """
+    returnvalue = df
 
     return returnvalue
 
@@ -193,11 +190,12 @@ def getData(mode, year_cons=None, start_year_ee=None, end_year_ee=None, optional
     
     elif mode == "Heatpump":
         path_var = "CSV/Lastprofile/waermepumpe/"
-        file_path = os.path.join(path_var, "lp_WP_neu.csv")
+        file_path = os.path.join(path_var, "Wärmepumpe.csv")
         if os.path.exists(file_path):
-            dataFrames = read_SMARD_data(file_path, "Heatpump")
-        else: 
-            print(f"File for heatpump loadprofile not found at path: {file_path}")
+            df_heatpump = read_SMARD_data(file_path, "Heatpump")
+
+        else:
+            print(f"File for temperature not found at path: {file_path}")
     
     elif mode == "Temperature":
         path_var = "CSV/Temperatur/"
@@ -226,6 +224,8 @@ def getData(mode, year_cons=None, start_year_ee=None, end_year_ee=None, optional
         returnvalue = df_temperature
     elif mode == "Population":
         returnvalue = df_population
+    elif mode == "Heatpump":
+        returnvalue = df_heatpump
     else:
         returnvalue = dataFrames
     

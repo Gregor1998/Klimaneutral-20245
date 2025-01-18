@@ -8,7 +8,7 @@ from utils.read_CSV import getData
 from utils.addTimePerformance import addTimePerformance
 from utils.temperature import temperatureRegion
 
-"""
+
 def load_profile_heatpump(installed_heatpumps, expected_heatpumps, first_year, end_year):
 
     diffrence_year = end_year - first_year  # Abstand für die für die for-Schleife
@@ -23,7 +23,7 @@ def load_profile_heatpump(installed_heatpumps, expected_heatpumps, first_year, e
     daily_expansion_rate_heatpump = diffrence_heatpumps / (diffrence_year*365) # tägliche Zubaurate für die Wärmepumpe
 
     for year in range(first_year, end_year+1): 
-        heatpump_df = pd.DataFrame({"Verbrauch": [0.0]*35040}) # Anlegung eines leeren DataFrames für das Lastprpfil pro Viertelstunde
+        heatpump_df = pd.DataFrame({"Verbrauch in MWh": [0.0]*35040}) # Anlegung eines leeren DataFrames für das Lastprpfil pro Viertelstunde
         heatpump_df = addTimePerformance(heatpump_df, year) # Hinzufügen der Zeitspalte
                                 
         for day in range(365):  #Lastprofil errechnen mit einer täglichen Zubaurate
@@ -32,13 +32,13 @@ def load_profile_heatpump(installed_heatpumps, expected_heatpumps, first_year, e
 
             current_installed += daily_expansion_rate_heatpump
 
-            heatpump_df.loc[start_index:end_index, "Verbrauch"] = df["Lastprofil"][start_index:end_index] * current_installed/1000  # in MWh
+            heatpump_df.loc[start_index:end_index, "Verbrauch in MWh"] = df["Lastprofil"][start_index:end_index] * current_installed/1000  # in MWh
 
         directory_heatpump_comsumption[year] = heatpump_df
         directory_heatpump_comsumption[year].to_csv(f"CSV/Lastprofile/waermepumpe/Hochrechnung/Heatpump_{year}.csv", index=False)
 
     return directory_heatpump_comsumption
-"""
+
 
 """"
 def lastprofil_heatpump(installed_heatpumps, expected_heatpumps, first_year, end_year, case_Temperature):
@@ -116,7 +116,7 @@ def lastprofil_heatpump(installed_heatpumps, expected_heatpumps, first_year, end
 """
    
 
-
+"""
 def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_year, case_Temperature):
     
     df_population = getData("Population") # Einlesen der Bevölkerungszahlen
@@ -257,7 +257,7 @@ def heatpump_Region(installed_heatpumps, expected_heatpumps, first_year, end_yea
 
     return directory_heatpump_comsumption #Rückgabe des Dictionarys mit den Jahresverbräuchen für Deutschland
 
-
+"""
 
         
 
