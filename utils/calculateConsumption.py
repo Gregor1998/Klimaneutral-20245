@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
 from functools import lru_cache
-from utils.read_CSV import getData  # For loading CSV data
-from utils.extraploation_class import Extrapolation_Consumption  # For projecting future consumption
-from utils.addTimeInformation import addTimeInformation  # For adding time-related columns
-#from szenarioDefinition.szenario import*  # Currently unused
-from utils import config  # For configuration parameters
+from utils.read_CSV import getData
+from utils.extraploation_class import Extrapolation_Consumption
+from utils.addTimeInformation import addTimeInformation
+from utils import config
 
 @lru_cache(maxsize=8)
 def getConsumptionYear(year):
@@ -19,175 +18,131 @@ def getConsumptionYear(year):
         DataFrame: Consumption data for the year
     """
     try:
-        # Optimized CSV reading
         consumption = getData("Consumption", year)[year]
-        
         return consumption
     except Exception as e:
         print(f"Error loading consumption data for year {year}: {e}")
         return None
 
+def apply_lastprofile(df, lastprofile, heatpump_profile, mode="add"):
+    """
+    Apply or subtract EV and heat pump profiles to/from consumption data.
+    
+    Args:
+        df (DataFrame): Consumption data
+        lastprofile (dict): EV load profiles by location and day type
+        heatpump_profile (DataFrame): Heat pump consumption data
+        mode (str): "add" or "subtract"
+        
+    Returns:
+        DataFrame: Adjusted consumption data
+    """
+    df_result = df.copy()
+    df_result['profile'] = 'workday'  # Default
+    df_result.loc[df_result['Weekday'] == 6, 'profile'] = 'saturday'
+    df_result.loc[df_result['Weekday'] == 7, 'profile'] = 'sunday'
+    
+    adjustments = np.zeros(len(df_result))
+    
+    # Sum EV profiles across locations
+    for location in lastprofile:
+        for day_type in ['workday', 'saturday', 'sunday']:
+            profile_data = lastprofile[location][day_type]['Leistung_MW'].values
+            profile_len = len(profile_data)
+            mask = df_result['profile'] == day_type
+            if sum(mask) > 0:
+                indices = np.where(mask)[0] % profile_len
+                adjustments[mask] += profile_data[indices]
+    
+    # Add heat pump consumption
+    if heatpump_profile is not None:
+        adjustments += heatpump_profile['Verbrauch in MWh'].values
+    
+    # Apply adjustments
+    if mode == "add":
+        df_result['Gesamtverbrauch'] += adjustments
+    elif mode == "subtract":
+        df_result['Gesamtverbrauch'] -= adjustments
+    
+    return df_result
 
 def calculateConsumption(consumption_development_per_year, lastprofile_dict, directory_heatpump_consumption):
     """
-    Calculate consumption with performance optimizations.
+    Calculate consumption without profiles, extrapolated for each year.
     
     Args:
-        consumption_development_per_year (dict): Development factors by year
+        consumption_development_per_year (dict): Annual growth factors
         lastprofile_dict (dict): Load profiles dictionary
         directory_heatpump_consumption (dict): Heat pump consumption data
     
     Returns:
-        dict: Dictionary of calculated consumption by year
+        dict: Consumption without profiles by year
     """
     consumption_all_years = {}
     base_year = config.params.consumption_year
     
-    # Get base consumption once
+    # Load base consumption
     base_consumption_df = getConsumptionYear(base_year)
-
     if base_consumption_df is None:
         return consumption_all_years
     
-    # Add time information to base consumption dataframe
-    base_consumption_df = addTimeInformation(base_consumption_df[base_year])
+    base_consumption_df = addTimeInformation(base_consumption_df)
     
-    # Process each year
-    for year, factor in consumption_development_per_year.items():
-        year = int(year)
-        
-        # Create a copy of base consumption
-        yearly_consumption = base_consumption_df.copy()
-        
-        # Apply scaling factor using vectorized operation
-        yearly_consumption['Gesamtverbrauch'] = yearly_consumption['Gesamtverbrauch'] * factor
-        
-        # Update date information for the current year
-        yearly_consumption['Datum'] = pd.to_datetime(yearly_consumption['Datum']).apply(
-            lambda x: x.replace(year=year)
+    # Subtract profiles from base year
+    base_heatpump_lp = directory_heatpump_consumption.get(base_year)
+    base_without_profiles = apply_lastprofile(
+        base_consumption_df,
+        lastprofile_dict[base_year],
+        base_heatpump_lp,
+        mode="subtract"
+    )
+    consumption_all_years[base_year] = base_without_profiles
+    
+    # Extrapolate sequentially
+    current_consumption = base_without_profiles.copy()
+    for year in range(base_year + 1, config.params.end_year_simulation + 1):
+        growth_factor = consumption_development_per_year.get(year, 1.0)
+        extrapolated_data = Extrapolation_Consumption(
+            current_consumption, year, None, None, None, growth_factor
         )
-        
-        # Re-add time information for the updated dates
-        yearly_consumption = addTimeInformation(yearly_consumption)
-        
-        # Add heat pump consumption if available
-        if year in directory_heatpump_consumption:
-            heatpump_df = directory_heatpump_consumption[year]
-            # Ensure both dataframes have the same length
-            min_length = min(len(yearly_consumption), len(heatpump_df))
-            yearly_consumption['Gesamtverbrauch'][:min_length] += heatpump_df['Verbrauch in MWh'][:min_length].values
-        
-        # Store the result
-        consumption_all_years[year] = yearly_consumption
-        
+        current_consumption = extrapolated_data.df
+        consumption_all_years[year] = current_consumption.copy()
     
     return consumption_all_years
 
-def _get_day_profiles(df):
-    """Helper function to efficiently determine profile type for each row"""
-    # Create a numpy array for profiles based on weekday
-    profiles = np.empty(len(df), dtype=object)
-    
-    # Vectorized assignment by weekday condition
-    weekdays = df['Weekday'].values
-    profiles[:] = 'workday'  # Default
-    profiles[weekdays == 6] = 'saturday'  # Saturday
-    profiles[weekdays == 7] = 'sunday'    # Sunday
-    
-    return profiles
-
 def calculateConsumption_lastprofile(consumption_development_per_year, lastprofile_dict, directory_heatpump_consumption):
     """
-    Calculate consumption with load profiles and optimized performance.
+    Calculate total consumption with profiles added back.
     
     Args:
-        consumption_development_per_year (dict): Development factors by year
+        consumption_development_per_year (dict): Annual growth factors
         lastprofile_dict (dict): Load profiles dictionary
         directory_heatpump_consumption (dict): Heat pump consumption data
     
     Returns:
-        dict: Dictionary of calculated consumption with load profiles by year
+        dict: Total consumption with profiles by year
     """
-    # Start with basic consumption calculation
-    consumption_all_years = calculateConsumption(
-        consumption_development_per_year, 
-        lastprofile_dict, 
+    # Get consumption without profiles
+    consumption_without_profiles = calculateConsumption(
+        consumption_development_per_year,
+        lastprofile_dict,
         directory_heatpump_consumption
     )
     
-    consumption_year = 2023
-    directory_yearly_consumption = {}
+    if not consumption_without_profiles:
+        return {}
     
-    # Base heatpump load profile for 2023
-    base_heatpump_lp = None
-    if consumption_year in directory_heatpump_consumption:
-        base_heatpump_lp = directory_heatpump_consumption[consumption_year]
+    # Add profiles for each year
+    consumption_with_profiles = {}
+    for year in consumption_without_profiles:
+        yearly_consumption = consumption_without_profiles[year]
+        heatpump_lp = directory_heatpump_consumption.get(year)
+        yearly_consumption = apply_lastprofile(
+            yearly_consumption,
+            lastprofile_dict[year],
+            heatpump_lp,
+            mode="add"
+        )
+        consumption_with_profiles[year] = yearly_consumption
     
-    def apply_lastprofile(df, lastprofile, heatpump_profile, mode="add"):
-        """Helper function to apply load profiles to a dataframe"""
-        # Make a copy of the dataframe to avoid modifying the original
-        df_result = df.copy()
-        
-        # Add profile column based on weekday
-        df_result['profile'] = 'workday'  # Default
-        df_result.loc[df_result['Weekday'] == 6, 'profile'] = 'saturday'  # Saturday
-        df_result.loc[df_result['Weekday'] == 7, 'profile'] = 'sunday'    # Sunday
-        
-        # Filter out rows with missing profile
-        df_result = df_result[df_result['profile'].notna()]
-        
-        # Apply load profiles efficiently
-        for location, day_profiles in lastprofile.items():
-            for day_type in ['workday', 'saturday', 'sunday']:
-                # Get profile data for this day type
-                profile_data = day_profiles[day_type]['Leistung_MW'].values
-                profile_len = len(profile_data)
-                
-                # Create a mask for this day type
-                mask = df_result['profile'] == day_type
-                
-                if sum(mask) > 0:
-                    # Calculate indices into profile data for each row
-                    indices = np.where(mask)[0] % profile_len
-                    
-                    # Apply the profile data
-                    if mode == "add":
-                        df_result.loc[mask, 'Gesamtverbrauch'] += profile_data[indices]
-                    else:
-                        df_result.loc[mask, 'Gesamtverbrauch'] -= profile_data[indices]
-        
-        return df_result
-    
-    try:
-        import numpy as np
-        
-        # For each year, process the consumption with load profiles
-        for year, factor in consumption_development_per_year.items():
-            year = int(year)
-            
-            if year in consumption_all_years and year in lastprofile_dict:
-                # Get the consumption dataframe for this year
-                yearly_consumption = consumption_all_years[year]
-                
-                # Ensure time information is present
-                yearly_consumption = addTimeInformation(yearly_consumption)
-                
-                # Apply load profiles
-                yearly_consumption = apply_lastprofile(
-                    yearly_consumption,
-                    lastprofile_dict[year],
-                    directory_heatpump_consumption.get(year),
-                    mode="add"
-                )
-                
-                # Store the result
-                directory_yearly_consumption[year] = yearly_consumption
-                
-                print(f"UPDATE {yearly_consumption}")
-    
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"Error in calculateConsumption_lastprofile: {e}")
-    
-    return directory_yearly_consumption or consumption_all_years
+    return consumption_with_profiles
