@@ -16,12 +16,6 @@ def read_SMARD_data(path, mode):
     elif mode == "Heatpump":
         usecols = ["Datum", "Lastprofil"]
         dtype = {"Lastprofil": "float32"}
-    elif mode == "Temperature":
-        usecols = ["TT_TU"]
-        dtype = {"TT_TU": "float32"}
-    elif mode == "Population":
-        usecols = None  # Alle Spalten laden, falls keine spezifischen bekannt sind
-        dtype = None
     else:
         raise ValueError("Unbekannter Modus")
 

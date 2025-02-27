@@ -37,11 +37,7 @@ def load_profile_heatpump(current_installed, target_installed, start_year, end_y
     for year in range(start_year, end_year + 1):
         # Create a copy of the base profile to avoid modifying the original
         yearly_profile = base_profile.copy()
-        
-        # Debug information to understand data structure
-        print(f"Year: {year}, yearly_profile columns: {yearly_profile.columns.tolist()}")
-        print(f"yearly_profile dtypes: {yearly_profile.dtypes}")
-        
+                
         # Scale the consumption based on heat pump numbers - vectorized operation
         scaling_factor = installations[year] / current_installed
         
