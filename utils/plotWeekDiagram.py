@@ -1,29 +1,24 @@
 from datetime import datetime, timedelta
 import pandas as pd
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from matplotlib.dates import DayLocator, DateFormatter
 from utils.addTimeInformation import addTimeInformation
 from utils.calcDifference_storage_flexpowerplant import differenceBetweenDataframes, StorageIntegration
 from utils.cleanse_dataframes import cleanse_dataframes
-#from szenarioDefinition.szenario import*
 from utils import config
 
 def plotWeekDiagramm(selectedWeek, selectedYear, consumption_extrapolation, production_df, storage_df, flexipowerplant_df, storage_ee_combined_df, all_combined_df, fileName=None):
     yearly_consumption = pd.DataFrame.from_dict(consumption_extrapolation.get(int(selectedYear)))
 
-
-    # daten nur für angegebene woche und jahr finden
+    # Filter data for the specified week and year
     week_filtered_data_consumption = yearly_consumption[
         (yearly_consumption['Year'] == selectedYear) & 
         (yearly_consumption['Week'] == selectedWeek)
     ]
 
-    # dataframe erstellen nur mit datum und gesamtverbrauch
+    # Create a DataFrame with only the date and total consumption
     week_consumption_df = week_filtered_data_consumption[['Datum', 'Gesamtverbrauch']]
     week_consumption_df['Datum'] = pd.to_datetime(week_consumption_df['Datum'])
 
-    
     # Filter production data
     week_filtered_data_production = production_df[
         (production_df['Week'] == selectedWeek) &

@@ -1,4 +1,4 @@
-import pandas as pd # type: ignore
+import pandas as pd
 
 # Verbrauch - Produktion
 def differenceBetweenDataframes(df1, df2):
@@ -11,38 +11,23 @@ def differenceBetweenDataframes(df1, df2):
         difference_df['Year Month'] = difference_df['Datum'].dt.strftime('%Y %m')
         difference_df['Day'] = difference_df['Datum'].dt.strftime('%d')
 
-        
         return difference_df
     else:
         return None
 
 def calculateLongestPeriods(difference_df, Case=None):
     # Überprüfen, ob die Spalte 'Differenz in MWh' existiert, andernfalls 'Restenergiebedarf in MWh' verwenden
-    if 'Differenz in MWh' in difference_df.columns:
-        energy_column = 'Differenz in MWh'
-    elif 'Restenergiebedarf in MWh' in difference_df.columns:
-        energy_column = 'Restenergiebedarf in MWh'
-    else:
-        raise ValueError("Neither 'Differenz in MWh' nor 'Restenergiebedarf in MWh' column found in the DataFrame")
+    energy_column = 'Differenz in MWh' if 'Differenz in MWh' in difference_df.columns else 'Restenergiebedarf in MWh'
 
     difference_df['Sign'] = difference_df[energy_column].apply(lambda x: 'Positive' if x > 0 else 'Negative')
     difference_df['Group'] = (difference_df['Sign'] != difference_df['Sign'].shift()).cumsum()
 
     negative_groups = difference_df[difference_df['Sign'] == 'Negative'].groupby('Group').size()
-
-    if not negative_groups.empty:
-        longest_negative_period = negative_groups.idxmax()
-    else:
-        longest_negative_period = 0    
+    longest_negative_period = negative_groups.idxmax() if not negative_groups.empty else 0
 
     positive_groups = difference_df[difference_df['Sign'] == 'Positive'].groupby('Group').size()
+    longest_positive_period = positive_groups.idxmax() if not positive_groups.empty else 0
 
-    if not positive_groups.empty:
-        longest_positive_period = positive_groups.idxmax()
-    else:
-        longest_positive_period = 0  
-
-        
     longest_negative_df = difference_df[difference_df['Group'] == longest_negative_period] if longest_negative_period is not None else pd.DataFrame()
     longest_positive_df = difference_df[difference_df['Group'] == longest_positive_period] if longest_positive_period is not None else pd.DataFrame()
 
@@ -56,18 +41,15 @@ def calculateLongestPeriods(difference_df, Case=None):
     sum_longest_negative = longest_negative_df[energy_column].sum() if not longest_negative_df.empty else 0
     sum_longest_positive = longest_positive_df[energy_column].sum() if not longest_positive_df.empty else 0
 
-    if Case == "residual":
-        energy_demand = sum_longest_positive
-    else:
-        energy_demand = abs(sum_longest_negative)
-        energy_power = abs(difference_df[energy_column].max() / 0.25)
+    energy_demand = sum_longest_positive if Case == "residual" else abs(sum_longest_negative)
+    energy_power = abs(difference_df[energy_column].max() / 0.25)
 
     # Calculate flex demand
     if sum_longest_negative + sum_longest_positive <= 0:
         further_demand = 0
         further_demand_power = 0
     else:
-        further_demand = sum_longest_negative + sum_longest_positive 
+        further_demand = sum_longest_negative + sum_longest_positive
         # Count the number of rows in longest_negative_df and longest_positive_df
         t_negativ = len(longest_negative_df) if not longest_negative_df.empty else 1
         t_positiv = len(longest_positive_df) if not longest_positive_df.empty else 1
@@ -86,7 +68,6 @@ def calculateLongestPeriods(difference_df, Case=None):
     return energy_demand, energy_power, further_demand, further_demand_power
 
 def StorageIntegration(Case, consumption_df, generation_df, difference_df, storage_max_power, storage_capacity, flexipowerplant_power):
-    
     storage = 0
     battery_capacity = storage_capacity * 10**3  # in MWh
     storage_max_power = storage_max_power * 10**3  # in MW
