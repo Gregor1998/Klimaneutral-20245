@@ -47,7 +47,7 @@ def apply_lastprofile(df, lastprofile, heatpump_profile, mode="add"):
     # Sum EV profiles across locations
     for location in lastprofile:
         for day_type in ['workday', 'saturday', 'sunday']:
-            profile_data = lastprofile[location][day_type]['Leistung_MW'].values
+            profile_data = lastprofile[location][day_type]['Normierter Bedarf'].values
             profile_len = len(profile_data)
             mask = df_result['profile'] == day_type
             if sum(mask) > 0:

@@ -108,8 +108,8 @@ def create_week_comparison(year, week, consumption_data, production_data, fileNa
     )
 
     # Save plot to file
-    if fileName:
-        fig.write_image(f'assets/plots/{fileName}.png')
+    #if fileName:
+        #fig.write_image(f'assets/plots/{fileName}.png')
 
     # Show plot
     fig.show()
