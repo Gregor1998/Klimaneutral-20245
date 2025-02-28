@@ -1,8 +1,37 @@
+"""
+-------------------------------------------------------------------------------
+read_CSV.py - SMARD Energy Data Reader Utility
+-------------------------------------------------------------------------------
+This module provides functions to read and process energy data from SMARD CSV files.
+It handles various data types including renewable energy generation, consumption,
+installed capacity, and heat pump load profiles.
+
+The module optimizes data loading through caching and specialized parsing for
+different data types. All data is returned as clean pandas DataFrames with
+standardized column names and appropriate data types.
+
+Main functions:
+- read_SMARD_data: Processes CSV files with different modes (Generation, Consumption, etc.)
+- getData: Cached function to retrieve data by year or year ranges
+
+Created for the Klimaneutral-2024 project.
+-------------------------------------------------------------------------------
+"""
 import pandas as pd
 import os
 from functools import lru_cache
 
 def read_SMARD_data(path, mode):
+    """
+    Read and process SMARD data CSV files according to specified mode.
+    
+    Args:
+        path (str): Path to the CSV file
+        mode (str): Type of data - 'Generation', 'Consumption', 'Installed', 'Heatpump'
+    
+    Returns:
+        pandas.DataFrame: Processed data with standardized column names
+    """
     # Spalten und Datentypen je nach Modus definieren
     if mode == "Generation":
         usecols = ["Datum von","Biomasse [MWh] Originalauflösungen","Wasserkraft [MWh] Originalauflösungen", "Wind Offshore [MWh] Originalauflösungen", "Wind Onshore [MWh] Originalauflösungen", "Photovoltaik [MWh] Originalauflösungen","Sonstige Erneuerbare [MWh] Originalauflösungen"]
@@ -20,6 +49,7 @@ def read_SMARD_data(path, mode):
         raise ValueError("Unbekannter Modus")
 
     # CSV-Datei laden mit optimierten Parametern
+    # German-formatted CSV: semicolon separator, comma as decimal, period as thousands separator
     df = pd.read_csv(
         path,
         delimiter=";",
@@ -30,12 +60,13 @@ def read_SMARD_data(path, mode):
     )
 
     # Manuell Datum konvertieren (entfernt str dtype für Datum)
+    # Handle date formatting based on column names
     if "Datum von" in df.columns:
         df["Datum von"] = pd.to_datetime(df["Datum von"], format="%d.%m.%Y %H:%M", errors='coerce')
     elif "Datum" in df.columns and mode != "Installed":
         df["Datum"] = pd.to_datetime(df["Datum"], format="%d.%m.%Y %H:%M", errors='coerce')
 
-    # Spalten direkt umbenennen
+    # Spalten direkt umbenennen für einheitliche Namensgebung in der gesamten Anwendung
     if mode == "Generation":
         df.rename(columns={
             "Datum von": "Datum",
@@ -60,7 +91,7 @@ def read_SMARD_data(path, mode):
     elif mode == "Temperature":
         df.rename(columns={"TT_TU": "Temperatur"}, inplace=True)
 
-    # Spezifische Anpassungen
+    # Spezifische Anpassungen: Entferne Schalttage (29. Februar) für konsistente Jahresvergleiche
     if mode in ["Generation", "Consumption", "Heatpump"] and "Datum" in df.columns:
         # Prüfe ob Datum eine Datetime-Spalte ist
         if pd.api.types.is_datetime64_dtype(df["Datum"]):
@@ -79,19 +110,22 @@ def read_SMARD_data(path, mode):
 def getData(type, year=None, start_year=None, end_year=None):
     """
     Read CSV data with caching for better performance.
+    The function uses lru_cache to avoid re-reading files that have been
+    accessed recently, improving application performance.
     
     Args:
-        type (str): Type of data to read ('Generation', 'Installed', etc.)
+        type (str): Type of data to read ('Generation', 'Consumption', 'Installed', 'Heatpump')
         year (int, optional): Specific year to load
         start_year (int, optional): Start year for range
         end_year (int, optional): End year for range
     
     Returns:
-        dict: Dictionary of dataframes by year
+        dict: Dictionary of dataframes by year or single dataframe for heatpump
     """
     directory_yearly = {}
     
     # Special case for Heatpump with no year specified
+    # Heat pump profiles are template-based and not year-specific by default
     if type == "Heatpump" and year is None and start_year is None and end_year is None:
         try:
             path_var = "CSV/Lastprofile/waermepumpe/"
@@ -112,7 +146,7 @@ def getData(type, year=None, start_year=None, end_year=None):
     if year is not None:
         return _read_single_year(type, year)
         
-    # If range of years is requested
+    # If range of years is requested - build dictionary with year as key
     if start_year is not None and end_year is not None:
         for year in range(start_year, end_year + 1):
             df_year = _read_single_year(type, year)
@@ -122,9 +156,18 @@ def getData(type, year=None, start_year=None, end_year=None):
     return directory_yearly
 
 def _read_single_year(type, year):
-    """Helper function to read data for a single year with optimized reading"""
+    """
+    Helper function to read data for a single year with optimized reading
+    
+    Args:
+        type (str): Type of data to read
+        year (int): Year to load
+        
+    Returns:
+        dict: Dictionary with year as key and dataframe as value, or None if error
+    """
     try:
-        # Bestimme den Dateipfad
+        # Bestimme den Dateipfad basierend auf dem Datentyp und Jahr
         if type == "Generation":
             file_path = f"CSV/{type}/Realisierte_Erzeugung_{year}01010000_{year+1}01010000_Viertelstunde.csv"
         elif type == "Consumption":
@@ -147,6 +190,7 @@ def _read_single_year(type, year):
         
         if type == "Heatpump":
             # For heat pump data, add the year to the dates if needed
+            # This allows using the template profile for specific years
             if "Datum" in df.columns:
                 df["Datum"] = df["Datum"].apply(lambda x: x.replace(year=year))
         
@@ -155,4 +199,3 @@ def _read_single_year(type, year):
     except Exception as e:
         print(f"Error loading data for {year}: {e}")
         return None
-
