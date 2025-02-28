@@ -251,11 +251,11 @@ def main(sheet_name=None):
     
     # Define the visualization images to include in the results
     images = [
-        ('assets/plots/heatmap_1_Differenz von EE und Verbrauch in MWh.png', 'A6'),
-        ('assets/plots/heatmap_1_Überschüssige bzw. Restbedarf Energie nach maximal möglicher Nutzung von Speicher.png', 'A26'),
-        ('assets/plots/heatmap_2_Überschüssige bzw. Restbedarf Energie nach zusätzlich optimalen Ausbau von Flexiblen.png', 'A46'),
-        (f'assets/plots/heatmap_3_Überschüssige bzw. Restbedarf Energie mit Speicher ({params["scenario_name"]}).png', 'A66'),
-        (f'assets/plots/heatmap_4_Überschüssige bzw. Restbedarf Energie mit Speicher und Flexiblen ({params["scenario_name"]}).png', 'A86'),
+        ('assets/plots/heatmap_1_Difference between Renewable Generation and Consumption in MWh.png', 'A6'),
+        ('assets/plots/heatmap_1_Excess or Residual Energy after Maximum Possible Storage Usage.png', 'A26'),
+        ('assets/plots/heatmap_2_Excess or Residual Energy after Optimal Flexible Power Plant Expansion.png', 'A46'),
+        (f'assets/plots/heatmap_3_Excess or Residual Energy with Storage ({params["scenario_name"]}).png', 'A66'),
+        (f'assets/plots/heatmap_4_Excess or Residual Energy with Storage and Flexible Power Plants ({params["scenario_name"]}).png', 'A86'),
         (f'assets/plots/wochendiagramm_KW_week{params["selected_week_plot"]}_{params["selected_year_plot"]}.png', 'A106'),
         ('assets/plots/summenhistogramm.png', 'A126'),
         ('assets/plots/summenhistogramm_all.png', 'A146'),
