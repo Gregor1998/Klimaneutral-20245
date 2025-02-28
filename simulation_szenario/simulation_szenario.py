@@ -256,7 +256,7 @@ def main(sheet_name=None):
         ('assets/plots/heatmap_2_Überschüssige bzw. Restbedarf Energie nach zusätzlich optimalen Ausbau von Flexiblen.png', 'A46'),
         (f'assets/plots/heatmap_3_Überschüssige bzw. Restbedarf Energie mit Speicher ({params["scenario_name"]}).png', 'A66'),
         (f'assets/plots/heatmap_4_Überschüssige bzw. Restbedarf Energie mit Speicher und Flexiblen ({params["scenario_name"]}).png', 'A86'),
-        ('assets/plots/wochendiagramm_KW.png', 'A106'),
+        (f'assets/plots/wochendiagramm_KW_week{params["selected_week_plot"]}_{params["selected_year_plot"]}.png', 'A106'),
         ('assets/plots/summenhistogramm.png', 'A126'),
         ('assets/plots/summenhistogramm_all.png', 'A146'),
         ('assets/plots/summenhistogramm_ee_storage.png', 'A166'),

@@ -164,6 +164,7 @@ def plotWeekDiagramm(selected_week, selected_year, consumption_dict, production_
     
     # Save to HTML for interactive viewing in browser
     fig.write_html(f'assets/plots/{name}_week{selected_week}_{selected_year}.html')
+    fig.write_image(f'assets/plots/{name}_week{selected_week}_{selected_year}.png', format='png')
 
 
 def create_week_comparison(selected_week, selected_year, df1, df2, name):
@@ -218,8 +219,9 @@ def create_week_comparison(selected_week, selected_year, df1, df2, name):
     
     # Display the figure in notebook environment
     display(fig)
-    
-    # Save outputs in different formats
-    fig.write_html(f'assets/plots/{name}_week{selected_week}_{selected_year}.html')
     # Save static image for reports and presentations
+    #fig.write_image(f'assets/plots/{name}_week{selected_week}_{selected_year}.png', format='png')
     fig.write_image(f'assets/plots/{name}_week{selected_week}_{selected_year}.png', format='png')
+    # Save outputs in different formats
+    #fig.write_html(f'assets/plots/{name}_week{selected_week}_{selected_year}.html')
+    
